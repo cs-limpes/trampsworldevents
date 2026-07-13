@@ -1,487 +1,240 @@
-# Fresno Events Product Specification
+# TrampsWorld Events Product Specification
 
-## 1. Product summary
+## Product summary
 
-Fresno Events is a polished, public event-discovery website serving Fresno and nearby communities. It transforms a curated Google Calendar into a more attractive, readable, searchable, filterable, and shareable local events destination.
+TrampsWorld Events is a polished regional motorsports and outdoor-recreation event discovery site for Arizona, California, Nevada, and New Mexico. It transforms a curated Google Calendar into a readable, searchable, filterable, and shareable public destination while also creating a foundation for TrampsWorld media coverage.
 
-The product should feel like a local editorial publication with excellent calendar functionality, not like an embedded Google Calendar.
+The product should feel like part event guide, part regional road-culture publication, and part gateway into TrampsWorld coverage. It must not feel like an embedded Google Calendar or generic event SaaS.
 
-## 2. Primary goals
+## Primary goals
 
 The site should:
 
-- Help residents quickly discover worthwhile local events.
-- Present event information clearly on mobile and desktop.
-- Support browsing by date, category, location, audience, and price.
-- Maintain a cohesive visual identity even when source flyers are inconsistent.
-- Make ongoing event publishing manageable through Google Calendar.
-- Prove real event-data behavior early so recurring events, all-day events, multi-day events, metadata, and source quirks inform the interface before visual polish is finalized.
-- Keep reader usability, ease of understanding, and data correctness ahead of decorative design.
-- Provide a foundation for future audience growth, sponsorships, newsletters, promoted events, and organizer submissions.
-- Remain inexpensive to operate during early growth.
-- Scale without requiring a full rewrite if traffic becomes substantial.
+- help readers discover relevant events by date, state, location, vertical, category, audience, and price
+- support quick mobile browsing for travelers, riders, drivers, boaters, and local attendees
+- maintain a coherent TrampsWorld identity even when source flyers are inconsistent
+- reuse the proven Fresno Events application instead of rebuilding basic calendar infrastructure
+- support reliable publishing through Google Calendar and Flyer2Calendar metadata
+- create stable event pages that can connect to later videos, photo galleries, Road Notes coverage, and sponsor relationships
+- remain inexpensive to operate during early growth
+- scale without a full rewrite if traffic and editorial activity increase
 
-## 3. Initial geographic scope
+## Geographic scope
 
-Primary:
+Initial states:
 
-- Fresno
-- Clovis
+- Arizona
+- California
+- Nevada
+- New Mexico
 
-Secondary, when editorially relevant:
+The site is regional, not city-centered. State is a required first-class browsing facet when known.
 
-- Madera
-- Sanger
-- Selma
-- Reedley
-- Kerman
-- nearby Central Valley communities
+Useful location fields may include state, city, venue, region, route, lake or river, fairground, track, and online status.
 
-The site may eventually support a broader regional scope, but the initial identity should remain Fresno-centered.
+## Verticals
 
-## 4. Audience
+Every event may belong to one primary TrampsWorld vertical and may have secondary tags.
 
-Primary users include:
+- **HotRodTramp**: hot rods, rat rods, classic cars, customs, car shows, automotive culture, drag racing where editorially appropriate
+- **CycleTramp**: motorcycles, rallies, rides, choppers, bike nights, motorcycle shows and culture
+- **RiverTramp**: lakes, rivers, boating, personal watercraft, water recreation, boat shows and waterfront events
+- **DirtTramp**: off-road, desert racing, motocross, dirt track, UTV, ATV, trucks, sand and trail events
 
-- Fresno-area residents looking for things to do
-- families
-- artists and makers
-- music and nightlife audiences
-- community members
-- tourists and recent arrivals
-- organizers and venues
-- local businesses and potential sponsors
+Use `unclassified` when the source does not support a confident vertical assignment. Do not force a guess.
 
-The site should work well for people who arrive with either a specific intent or no plan at all.
+## Audience
 
-Examples:
+Primary users include motorsports and outdoor-recreation enthusiasts, event travelers, local attendees, clubs, organizers, venues, sponsors, tourism partners, and existing TrampsWorld viewers.
 
-- "What is happening tonight?"
-- "What can I do this weekend?"
-- "Are there any free family events?"
-- "Show me art events in Tower District."
-- "What is coming up soon?"
+Typical questions include:
 
-## 5. Product voice
+- What is happening this weekend?
+- What motorcycle events are coming up in Arizona?
+- Show me car shows in California.
+- What boating events are happening around Lake Havasu?
+- Are there any dirt events next month?
+- Has TrampsWorld covered this event before?
 
-The voice should be:
+## Product voice
 
-- welcoming
-- useful
-- locally aware
-- lively without being breathless
-- polished without sounding municipal or corporate
-- editorial rather than bureaucratic
-- concise where people are scanning
+The voice should be useful, energetic, road-aware, direct, and polished without sounding corporate. It should reflect real enthusiasm without excessive hype or AI-flavored filler.
 
-Avoid generic tourism copy, excessive hype, and AI-flavored filler.
+## Core browsing
 
-## 6. Information architecture
+The inherited product currently supports Agenda and Calendar views, keyword search, date windows, category, city, neighborhood, audience, and price filters.
 
-The eventual public site may include:
+The TrampsWorld conversion must add:
 
-- Home
-- Events
-- Full Calendar
-- Event detail pages
-- Categories
-- Neighborhoods or cities
-- This Weekend
-- Submit an Event
-- Newsletter
-- About
-- Contact
-- Sponsor or Advertise
+- state filtering
+- vertical filtering
+- regional location language appropriate to a four-state audience
+- TrampsWorld branding and copy
 
-Only the pages authorized in the current development phase should be implemented.
+### Today
 
-## 7. Homepage concept
+Shows events occurring during the current site day using the documented site reference timezone.
 
-The mature homepage should support:
+### This Weekend
 
-- branded header and navigation
-- logo
-- short introductory copy
-- prominent event search
-- Today
-- This Weekend
-- Upcoming
-- featured events
-- category browsing
-- upcoming event cards
-- newsletter signup
-- submission link
-- sponsor placements
-- footer with about, contact, and policy links
+Initial definition remains Friday at 4:00 PM through Sunday at 11:59:59 PM in the site reference timezone. Multi-timezone behavior must be reviewed during conversion rather than silently inherited.
 
-The homepage should prioritize immediate discovery over explaining the platform.
+### Upcoming
 
-## 8. Core browsing modes
+The remainder of the current month, unless fewer than seven days remain, then the next seven days.
 
-### 8.1 Today
+### Full Calendar
 
-Shows events occurring during the current calendar day in `America/Los_Angeles`.
+Retain the existing FullCalendar month and list experiences as an alternate browsing mode.
 
-All-day events appear before timed events unless a later design decision specifies otherwise.
+## Event cards
 
-### 8.2 This Weekend
+Cards should normally show:
 
-Default definition:
-
-- Friday at 4:00 PM through Sunday at 11:59:59 PM
-- calculated in `America/Los_Angeles`
-
-Events beginning earlier but continuing into the weekend should be included when their active time overlaps the window.
-
-This definition may be revised later, but it must remain explicit and tested.
-
-### 8.3 Upcoming
-
-Default definition:
-
-- the remainder of the current calendar month, calculated in `America/Los_Angeles`
-- if the remainder of the month is less than 7 days, use the next 7 days instead
-
-The window should include events whose active time overlaps the range, including all-day, multi-day, and recurring instances.
-
-This definition may be revised later, but it must remain explicit and tested.
-
-### 8.4 Full Calendar
-
-A calendar-oriented view for users who prefer date navigation.
-
-The product should not require the calendar grid to serve as the default homepage experience.
-
-### 8.5 Search
-
-Search should eventually cover normalized public fields such as:
-
-- title
-- description
+- vertical or category visual
+- event title
+- date and time
 - venue
-- city
-- neighborhood
+- city and state
+- primary vertical
 - category
-- organizer
-
-Search behavior must be clearly documented before implementation.
-
-## 9. Event cards
-
-Cards should remain visually consistent even when source events vary.
-
-Typical card content:
-
-- category visual or selected event image
-- title
-- date
-- start time or all-day label
-- venue
-- city or neighborhood
-- category
-- free or paid indicator when known
+- price or registration status when known
 - audience indicator when useful
-- featured or sponsored disclosure when applicable
+- featured, promoted, or sponsored disclosure when applicable
+- coverage indicator later, when implemented
 
-Cards must not imply unavailable information.
+Cards must not imply unavailable facts.
 
-Cards should be designed for fast scanning and touch interaction.
+## Event detail pages
 
-## 10. Event detail experience
+Retain the inherited event detail features:
 
-The eventual event detail view should support:
-
+- stable URL
 - title
 - date and time
-- all-day or multi-day treatment
-- venue and address
+- venue and location
 - map link
-- description
-- event image or flyer when available
-- category and tags
-- price information
-- organizer
-- source or official event link
+- safe public description
+- category, state, and vertical
+- organizer and official links when provided
 - Add to Google Calendar
 - downloadable `.ics`
-- sharing
-- accessibility information when provided
-- clear sponsored or promoted disclosure
+- copy and share controls
+- structured event data
 
-Event details must preserve useful formatting while sanitizing unsafe HTML.
+Potential later additions, each requiring authorization:
 
-## 11. Categories
+- related TrampsWorld videos
+- related photo galleries
+- prior-year coverage
+- Road Notes references
+- event-series history
+- media-pass or coverage status
+- sponsor modules
 
-Initial category taxonomy should be editorially manageable rather than exhaustive.
+## Categories
 
-Proposed primary categories:
+Categories describe what kind of event it is. Verticals describe which TrampsWorld editorial brand owns it. These are not interchangeable.
 
-- Art
-- Music
-- Food & Drink
-- Markets
-- Festivals
-- Family
-- Community
-- Classes & Workshops
-- Nightlife
-- Outdoors
-- Sports
-- Wellness
-- Spiritual
-- Theater & Film
+Initial categories may include:
+
+- Car Show
+- Motorcycle Event
+- Boat or Water Event
+- Off-Road Event
+- Race
+- Rally or Ride
+- Meet or Cruise
+- Festival
+- Expo or Trade Show
+- Swap Meet or Market
+- Community Event
 - Other
 
-An event may have one primary category and multiple secondary tags.
+Taxonomy should be validated against real TrampsWorld calendar inventory before being treated as final.
 
-The final taxonomy should be reviewed against real calendar data before live filtering is implemented.
+## State and location model
 
-## 12. Location model
+Supported state values:
 
-Location filtering may eventually include:
+- `AZ`
+- `CA`
+- `NV`
+- `NM`
+- `unknown`
 
-- city
-- neighborhood or district
-- venue
-- online
-- location unknown
+Location filtering may include city, venue, region, neighborhood or district where useful, lake or river, track, online, and unknown.
 
-Potential Fresno-area neighborhood labels include:
+Do not infer state or city from incomplete information unless a documented mapping rule supports it.
 
-- Tower District
-- Downtown Fresno
-- River Park
-- Fig Garden
-- Woodward Park
-- Sunnyside
-- Clovis
-- other editorially useful districts
+## Metadata strategy
 
-Neighborhood should not be guessed from incomplete data unless a documented mapping system is implemented.
+Google Calendar descriptions may include both human-readable details and machine-readable metadata.
 
-## 13. Price model
-
-Possible public values:
-
-- Free
-- Paid
-- Donation
-- Registration required
-- Price unknown
-
-Do not treat "registration required" as equivalent to paid.
-
-## 14. Audience model
-
-Possible values:
-
-- All ages
-- Family-friendly
-- Adults
-- 18+
-- 21+
-- Youth
-- Audience unknown
-
-Do not infer age restrictions unless the source provides them.
-
-## 15. Images and visual consistency
-
-The site should not depend on every event having a usable image.
-
-Default strategy:
-
-- consistent category-based visual system on browsing pages
-- optional flyer or event image on event detail pages
-- selective use of attractive event imagery for featured placements
-- safe cropping and aspect-ratio handling
-- intentional fallback art
-
-This prevents the page from becoming visually chaotic while still preserving original flyers where useful.
-
-## 16. Featured and promoted events
-
-Featured events may be editorially selected.
-
-Promoted or sponsored events may eventually be paid placements.
-
-Paid placement must always be clearly labeled and must not be presented as neutral editorial selection.
-
-The data model must distinguish:
-
-- featured
-- promoted
-- sponsored
-- ordinary
-
-Monetization functionality is not authorized until a future phase explicitly includes it.
-
-## 17. Event source and editorial workflow
-
-Initial source:
-
-- a dedicated Google Calendar containing publishable Fresno-area events
-
-Google Calendar remains the initial editorial management interface.
-
-The public website reads and normalizes calendar data. It does not expose private calendars or private event information.
-
-The initial implementation should use real data from the approved dedicated Google Calendar through server-side access, unless a later task explicitly authorizes static or fictional public fixtures. Data behavior should inform design decisions rather than being retrofitted after visual polish.
-
-Future workflow may include:
-
-- Flyer2Calendar
-- event submissions
-- moderation
-- organizer accounts
-- direct publishing tools
-
-These are future possibilities, not current authorization.
-
-## 18. Metadata strategy
-
-Google Calendar lacks a complete public event taxonomy.
-
-The initial system may parse a structured metadata block from event descriptions.
-
-Example:
+Preferred example:
 
 ```text
-Public event description.
+Event description.
 
 ---
-category: music
-tags: live music, local
-city: Fresno
-neighborhood: Tower District
-audience: 21+
-price: paid
+state: AZ
+vertical: cycletramp
+category: motorcycle-event
+tags: rally, ride
+city: Lake Havasu City
+audience: all-ages
+price: unknown
 featured: false
-image: https://example.com/image.jpg
 source: https://example.com/event
 ```
 
-The metadata block should be removed from the public description after parsing.
+Flyer2Calendar-style blocks may also be accepted when already present. Parsing rules belong in `event-data-model.md`.
 
-The final syntax, validation rules, and fallback behavior are defined in `event-data-model.md`.
+## Images and visual consistency
 
-## 19. Accessibility
+Browsing pages should default to a controlled TrampsWorld visual system based primarily on vertical and category. Original flyers and event images may be used selectively when quality, crop behavior, rights, and readability are appropriate.
 
-The site should target WCAG 2.2 AA practices.
+The site must not become a wall of unrelated flyers.
 
-Requirements include:
+## Editorial and media connections
 
-- keyboard navigation
-- visible focus states
-- semantic headings
-- meaningful link text
-- sufficient contrast
-- labels for controls
-- non-color indicators
-- screen-reader-friendly dates
-- reduced-motion support where relevant
-- touch targets appropriate for mobile
-- no essential information embedded only inside images
+Google Calendar is the initial source of published event facts.
 
-## 20. Mobile behavior
+Future authorized work may connect events with:
 
-Mobile is the primary layout.
+- YouTube videos and playlists
+- TrampsWorld websites and galleries
+- Road Notes newsletters
+- event coverage archives
+- photographer or videographer assignments
+- sponsor and partner placements
 
-The site must remain usable on narrow screens without horizontal scrolling.
+These connections must remain editorially clear and must not silently alter event facts.
 
-Filters should be easy to open, understand, apply, and clear.
+## Accessibility
 
-Date, time, venue, and event title should remain legible without requiring expansion.
+Target WCAG 2.2 AA practices, including keyboard navigation, visible focus, semantic headings, meaningful links, sufficient contrast, labeled controls, non-color indicators, screen-reader-friendly dates, reduced-motion support, adequate touch targets, and no essential information contained only in images.
 
-Calendar-grid behavior on mobile must be reviewed carefully rather than assumed.
+## Mobile behavior
 
-## 21. SEO and sharing
+Mobile is the primary layout. The site must remain usable without horizontal scrolling at narrow widths. State, vertical, date, and location controls must be easy to understand and clear.
 
-Future production requirements include:
+## SEO and sharing
 
-- indexable event detail pages
-- semantic metadata
-- Open Graph metadata
-- canonical URLs
-- event structured data where accurate
-- descriptive page titles
-- shareable filtered URLs
-- sitemap
-- robots configuration
-- graceful handling of expired events
+Retain stable event URLs, canonical URLs, Open Graph metadata, descriptive titles, structured event data when accurate, and shareable filtered URLs.
 
-SEO implementation belongs to the phase where routing and event details become real.
+Later additions may include sitemaps, event-series landing pages, vertical landing pages, state landing pages, and graceful expired-event archives.
 
-## 22. Performance
+## Trust and disclosure
 
-Target experience:
+The site must avoid inventing missing facts, label paid placements, distinguish editorial feature status from sponsorship, provide official source links when available, handle cancellation status honestly, and avoid exposing private calendar data.
 
-- fast initial render
-- responsive interaction on mid-range mobile devices
-- optimized images
-- cached event responses
-- minimal JavaScript and dependencies
-- graceful loading and error states
+## Future monetization
 
-Performance should be measured rather than assumed.
+Potential future revenue includes promoted events, newsletter sponsorships, event coverage packages, vertical sponsorships, state or regional sponsorships, advertising inventory, affiliate ticket links, venue profiles, and partner placements.
 
-## 23. Trust and editorial integrity
+No monetization implementation is authorized without a specific product and technical task.
 
-The site must:
+## Initial non-goals
 
-- clearly label sponsored content
-- avoid inventing missing facts
-- provide source links when available
-- display cancellation or status information when known
-- avoid exposing private event data
-- explain submission and correction processes once those exist
-
-## 24. Future monetization possibilities
-
-Potential future revenue:
-
-- promoted event placements
-- newsletter sponsorships
-- sponsored weekend guides
-- venue profiles
-- local business advertising
-- affiliate ticket links
-- paid organizer tools
-- premium submission options
-
-These are strategic context only. No monetization system should be built without explicit authorization.
-
-## 25. Product success indicators
-
-Early indicators:
-
-- events published reliably
-- event data is correct
-- visitors can find relevant events quickly
-- mobile usability is strong
-- repeat visits increase
-- newsletter signups begin
-- organizers request inclusion
-- local users share event pages
-
-Later indicators:
-
-- meaningful local search traffic
-- direct traffic and repeat usage
-- organizer adoption
-- sponsorship interest
-- monetization without harming trust
-
-## 26. Explicit non-goals for the initial product
-
-The initial product is not:
-
-- a ticketing platform
-- a social network
-- a general-purpose calendar app
-- an organizer CRM
-- a private scheduling tool
-- a replacement for Google Calendar editorial management
-- a user-account platform
-- a payment processor
-- a fully automated scraping system
+The initial TrampsWorld conversion is not a ticketing platform, social network, organizer CRM, user-account system, payment processor, automated scraper, or replacement for Google Calendar editorial management.

@@ -1,20 +1,21 @@
-# Fresno Events Data Model
+# TrampsWorld Events Data Model
 
-## 1. Purpose
+## Purpose
 
-This document defines the normalized public event model and the proposed structured metadata format stored in Google Calendar descriptions.
+This document defines the normalized public event model and the structured metadata expected from Google Calendar descriptions. It extends the inherited Fresno Events model with first-class state and vertical fields.
 
-The goal is to separate upstream Google Calendar quirks from the public UI.
-
-This model is implementation guidance for the functional data foundation phase once that phase is explicitly authorized.
-
-The project should prove the model against real approved Google Calendar data early. Test fixtures remain useful for edge cases, but public UI work should not depend on fictional events unless a task explicitly authorizes that fallback.
-
-## 2. Normalized event type
-
-Proposed TypeScript shape:
+## Normalized event type
 
 ```ts
+export type TrampsWorldState = 'AZ' | 'CA' | 'NV' | 'NM' | 'unknown'
+
+export type TrampsWorldVertical =
+  | 'hotrodtramp'
+  | 'cycletramp'
+  | 'rivertramp'
+  | 'dirttramp'
+  | 'unclassified'
+
 export type PublicEvent = {
   id: string
   source: {
@@ -23,7 +24,6 @@ export type PublicEvent = {
     eventId: string
     recurringEventId?: string
     originalStartTime?: string
-    htmlLink?: string
   }
 
   title: string
@@ -33,7 +33,7 @@ export type PublicEvent = {
 
   start: string
   end: string
-  timezone: 'America/Los_Angeles'
+  timezone?: string
   allDay: boolean
   multiDay: boolean
   status: 'confirmed' | 'tentative' | 'cancelled'
@@ -42,12 +42,15 @@ export type PublicEvent = {
     name?: string
     address?: string
     city?: string
+    state: TrampsWorldState
+    region?: string
     neighborhood?: string
     mapUrl?: string
     online: boolean
   }
 
   taxonomy: {
+    vertical: TrampsWorldVertical
     primaryCategory: EventCategory
     tags: string[]
     audience: EventAudience[]
@@ -71,13 +74,15 @@ export type PublicEvent = {
     imageUrl?: string
     imageAlt?: string
     flyerUrl?: string
-    categoryArtKey: string
+    visualKey: string
   }
 
   links: {
     sourceUrl?: string
     registrationUrl?: string
     websiteUrl?: string
+    videoUrl?: string
+    galleryUrl?: string
   }
 
   editorial: {
@@ -85,6 +90,7 @@ export type PublicEvent = {
     promoted: boolean
     sponsored: boolean
     sponsorName?: string
+    coverageStatus?: 'none' | 'planned' | 'published'
   }
 
   accessibility?: {
@@ -96,123 +102,98 @@ export type PublicEvent = {
 }
 ```
 
-Fields may be refined during implementation. Changes must be documented rather than made silently.
+The implementation may evolve, but state and vertical must remain separate first-class values.
 
-## 3. Event identifier
+## Identifiers
 
-The public `id` must uniquely identify an individual event occurrence.
+The public ID must identify an individual occurrence. Recurring events should combine source identity with original occurrence start. Titles are not authoritative identifiers.
 
-For recurring events, the source event ID alone may not be sufficient.
+## States
 
-A stable derived ID may combine:
+Accepted values:
 
-- Google event ID
-- original occurrence start
+- `AZ`
+- `CA`
+- `NV`
+- `NM`
+- `unknown`
 
-Do not derive the public identifier from title alone.
+Normalize full state names to their abbreviations. Invalid or missing values become `unknown`. Do not guess solely from a calendar name.
 
-Recurring-event instance identity is required for the first live-data implementation. It should not be deferred until later visual or calendar-grid work.
+## Verticals
 
-## 4. Categories
+Accepted values:
 
-Proposed enum:
+- `hotrodtramp`
+- `cycletramp`
+- `rivertramp`
+- `dirttramp`
+- `unclassified`
+
+Vertical assignment should come from explicit metadata or a documented conservative classification rule. Ambiguous events remain `unclassified`.
+
+## Categories
+
+Proposed values:
 
 ```ts
 export type EventCategory =
-  | 'art'
-  | 'music'
-  | 'food-drink'
-  | 'markets'
-  | 'festivals'
-  | 'family'
+  | 'car-show'
+  | 'motorcycle-event'
+  | 'boat-water-event'
+  | 'off-road-event'
+  | 'race'
+  | 'rally-ride'
+  | 'meet-cruise'
+  | 'festival'
+  | 'expo-trade-show'
+  | 'swap-meet-market'
   | 'community'
-  | 'classes-workshops'
-  | 'nightlife'
-  | 'outdoors'
-  | 'sports'
-  | 'wellness'
-  | 'spiritual'
-  | 'theater-film'
   | 'other'
 ```
 
-Unknown or invalid category values normalize to `other`.
+Unknown values normalize to `other`.
 
-Category taxonomy must be reviewed against actual event inventory before filters go live.
+## Audience and price
 
-## 5. Audience values
+Retain the inherited audience and price behavior unless a later task changes it. Missing price is `unknown`, never automatically free. Registration required does not imply paid.
 
-```ts
-export type EventAudience =
-  | 'all-ages'
-  | 'family-friendly'
-  | 'adults'
-  | '18-plus'
-  | '21-plus'
-  | 'youth'
-  | 'unknown'
-```
+## Description metadata
 
-Audience values must come from source information or explicit editorial metadata.
-
-## 6. Price values
-
-```ts
-export type EventPriceType =
-  | 'free'
-  | 'paid'
-  | 'donation'
-  | 'registration-required'
-  | 'unknown'
-```
-
-`registration-required` does not imply paid.
-
-Specific price strings may be retained separately, such as `$10-$20`.
-
-## 7. Description metadata format
-
-The proposed metadata block begins after a delimiter line containing exactly:
+Preferred delimiter format:
 
 ```text
----
-```
-
-Everything before the delimiter is public description content.
-
-Everything after it is metadata using one `key: value` entry per line.
-
-Example:
-
-```text
-Join local musicians for an evening show in the Tower District.
+Public description.
 
 ---
-category: music
-tags: live music, local artists
-city: Fresno
-neighborhood: Tower District
+state: AZ
+vertical: cycletramp
+category: motorcycle-event
+tags: rally, ride
+city: Lake Havasu City
 venue: Example Venue
-audience: 21+
-price: paid
-price_text: $12 advance / $15 door
+audience: all-ages
+price: unknown
 featured: false
 promoted: false
 sponsored: false
-image: https://example.com/event.jpg
-image_alt: Musicians performing on stage
-source: https://example.com/official-event
-registration: https://example.com/tickets
-organizer: Example Productions
+source: https://example.com/event
+video: https://youtube.com/example
+gallery: https://example.com/gallery
 ```
 
-## 8. Allowed metadata keys
+Existing delimiter-free Flyer2Calendar metadata may continue to be parsed when recognized. Migration should not break currently working feeds.
 
-Initial proposed keys:
+## Allowed metadata keys
 
+Initial keys include:
+
+- `state`
+- `vertical`
 - `category`
 - `tags`
 - `city`
+- `region`
 - `neighborhood`
 - `venue`
 - `address`
@@ -234,151 +215,54 @@ Initial proposed keys:
 - `organizer`
 - `organizer_url`
 - `accessibility`
+- `video`
+- `gallery`
+- `coverage_status`
 
 Unknown keys should be ignored and optionally logged in development.
 
-## 9. Parsing rules
-
-Proposed rules:
+## Parsing rules
 
 - keys are case-insensitive and normalized to lowercase
 - surrounding whitespace is trimmed
-- first delimiter only separates public description from metadata
-- duplicate scalar keys use the last valid value and produce a development warning
+- duplicate scalar keys use the last valid value and may warn in development
 - comma-separated lists are trimmed and deduplicated
 - booleans accept `true`, `false`, `yes`, and `no`
-- URLs must parse as HTTPS unless an explicit exception is approved
-- invalid values fall back safely
-- parser errors must not prevent the event from displaying
+- public URLs should use HTTPS unless an explicit exception is approved
+- parser failures must not prevent an otherwise valid event from displaying
 - raw metadata must never be shown publicly
+- state and vertical remain unknown when confidence is insufficient
 
-## 10. Fallback rules
+## Fallbacks
 
-### Missing category
+- missing state: `unknown`
+- missing vertical: `unclassified`
+- missing category: `other`
+- missing image: use vertical or category art
+- missing description: omit it
+- missing venue: show available city and state only when present
+- missing price: `unknown`
+- missing audience: `unknown`
 
-Use `other`.
+## Dates and timezones
 
-### Missing image
+Timed events should preserve source offsets or IANA timezone information. All-day event dates remain date-only and use an exclusive end date.
 
-Use category art.
+The site reference timezone may be `America/Phoenix`, but event-local display must not silently convert all event times to Phoenix time.
 
-### Missing description
+Tests must cover:
 
-Omit the description and excerpt.
+- Arizona events year-round
+- California and Nevada daylight-saving behavior
+- New Mexico Mountain Time behavior
+- recurring events crossing DST boundaries
+- all-day events without timezone drift
+- multi-day events spanning local midnight
 
-### Missing venue
+## Duplicate and cancellation behavior
 
-Display city or `Location not listed` only if product copy approves that phrase.
+Collapse only exact source occurrence duplicates automatically. Similar titles and times are not enough to delete an event. Canceled events should not appear as active.
 
-### Missing city
+## Test fixtures
 
-Do not infer it solely from the calendar name.
-
-A documented venue-to-city mapping may be used later.
-
-### Missing price
-
-Use `unknown`, not `free`.
-
-### Missing audience
-
-Use `unknown`.
-
-### Missing end time
-
-Google Calendar normally provides an end. If malformed upstream data lacks one, reject or repair according to an explicit tested rule during implementation.
-
-## 11. Date model
-
-Timed event:
-
-```json
-{
-  "start": "2026-07-10T19:00:00-07:00",
-  "end": "2026-07-10T21:00:00-07:00",
-  "allDay": false
-}
-```
-
-All-day event:
-
-```json
-{
-  "start": "2026-07-10",
-  "end": "2026-07-11",
-  "allDay": true
-}
-```
-
-For all-day events, the end date is exclusive.
-
-The normalized model may preserve date-only strings for all-day events to avoid timezone drift.
-
-## 12. Multi-day rules
-
-An event is multi-day when:
-
-- a timed event crosses the local calendar-day boundary, or
-- an all-day event spans more than one date
-
-Display behavior is defined by the design and implementation phase.
-
-## 13. Cancellation rules
-
-Canceled events should not normally appear in public browsing.
-
-A future feature may display recently canceled events with a cancellation notice when editorially useful.
-
-Do not silently present canceled events as active.
-
-## 14. Duplicate handling
-
-Potential duplicates may arise from:
-
-- repeated calendar entries
-- recurring instances
-- imported events
-- organizer corrections
-
-Initial rule:
-
-- only exact source occurrence duplicates should be automatically collapsed
-- title-and-time similarity alone should not delete events
-- fuzzy duplicate detection is a future editorial tool, not an initial public API responsibility
-
-## 15. Slugs
-
-Event-detail URLs may eventually use a readable slug plus stable identifier.
-
-Example:
-
-```text
-/events/moonlight-market-abc123
-```
-
-The stable identifier remains authoritative.
-
-Changing a title should not make the event unreachable.
-
-## 16. Test fixture requirements
-
-Test fixtures should include Google-like source records and normalized public records for:
-
-- timed event
-- all-day event
-- multi-day event
-- recurring instance
-- free event
-- paid event
-- unknown-price event
-- event without image
-- event with flyer
-- event without venue
-- long title
-- long description
-- 21+ event
-- family-friendly event
-- online event
-- featured event
-
-Fixtures are for automated tests, parser development, and rare offline debugging. Public reader-facing views should use real approved calendar data once the functional data foundation phase is authorized.
+Include fixtures for each state, each vertical, unknown state, unclassified vertical, timed, all-day, multi-day, recurring, modified, canceled, free, paid, unknown price, missing venue, missing image, long title, flyer, online event, featured event, sponsored event, and events with related video or gallery metadata.

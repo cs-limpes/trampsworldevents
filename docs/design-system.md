@@ -1,344 +1,136 @@
-# Fresno Events Design System
+# TrampsWorld Events Design System
 
-## 1. Design objective
+## Design objective
 
-Fresno Events should feel like a polished local editorial guide with strong calendar functionality.
+TrampsWorld Events should feel like a polished road-culture and motorsports-media guide with strong calendar functionality.
 
-It should not resemble:
+It should not resemble a raw Google Calendar embed, generic SaaS dashboard, municipal calendar, or chaotic wall of flyers.
 
-- a raw Google Calendar embed
-- municipal software
-- a generic SaaS dashboard
-- a chaotic digital bulletin board
-- a wall of unrelated event flyers
+The design should balance speed, grit, energy, readability, trust, and TrampsWorld personality.
 
-The design should balance energy, local personality, readability, and trust.
+## Brand foundation
 
-## 2. Design status
+The TrampsWorld family includes TrampsWorld, HotRodTramp, CycleTramp, RiverTramp, and DirtTramp.
 
-The visual identity is not yet final.
+Current established direction:
 
-The functional data foundation phase should keep styling plain and usable. A later reader-facing visual foundation phase may establish provisional tokens and component structure, but final logo, palette, typography, illustration style, and brand voice require human approval.
+- TrampsWorld orange: `#ff9000`
+- black: `#000000`
+- white and warm neutral supporting surfaces
+- bold stencil or industrial treatment for `TRAMPS`
+- complementary expressive lettering for supporting words
+- gauge, machine, route, road, water, and dirt motifs where appropriate
 
-Codex must not treat provisional choices as permanent brand decisions.
+Existing TrampsWorld logos and approved assets take precedence over invented replacements. Codex must not create or declare a new permanent logo without explicit approval.
 
-Current provisional direction:
+## Core principles
 
-- use `Fresno Events` in a bold serif font as a temporary wordmark until a proper logo is designed
-- use the supplied palette as the starting palette, with Elden Ring `#F28705` as the initial primary/accent color
-- use one default category artwork system for all categories at first, designed to be replaced later
-- keep colors, wordmark/logo treatment, graphics, and category artwork centralized and easy to change
+- Mobile first
+- Fast scanning
+- Strong date, state, vertical, and location hierarchy
+- Controlled variety across verticals
+- Calm structure around noisy event flyers
+- Accessibility built into components
+- Editorial clarity over decorative complexity
 
-## 3. Core design principles
+## Vertical visual system
 
-### Editorial consistency
+Verticals should have distinct motifs while remaining part of one family.
 
-Browsing pages should use consistent cards, spacing, typography, and category visuals.
+- HotRodTramp: gauge, chrome, grille, tire, pinstripe, road markings
+- CycleTramp: wheel, engine fins, handlebars, road stripe, chain or mechanical geometry
+- RiverTramp: waterline, wake, buoy, propeller, lake horizon
+- DirtTramp: dust, tread, desert line, checkers, trail, terrain contour
+- Unclassified: neutral TrampsWorld mark or general road motif
 
-### Mobile first
+Differences must not rely on color alone. Text labels remain visible.
 
-Design narrow screens first, then enhance for larger screens.
+## Page frame
 
-### Clear hierarchy
+The eventual structure may include header, primary navigation, hero or intro, search and filters, Today, This Weekend, Upcoming, Calendar, vertical browsing, state browsing, featured coverage, newsletter, sponsor placements, and footer.
 
-At a glance, users should understand:
+Only implement regions authorized by the current task.
 
-- what the event is
-- when it happens
-- where it happens
-- what kind of event it is
-- whether it is free or restricted
+## Header
 
-### Controlled variety
+The header may include the approved TrampsWorld logo or temporary wordmark, Events, Calendar, vertical navigation, state access, This Weekend, Submit or Contact, and mobile navigation.
 
-Categories may have distinct visual treatments, but all category art should belong to one coherent system.
+Hide controls that are not functional.
 
-### Calm around noisy source material
+## Event cards
 
-Original flyers may be visually inconsistent. Use them selectively.
+Recommended hierarchy:
 
-### Accessibility
-
-Contrast, focus, labels, reading order, and touch size are part of the design, not later polish.
-
-### Reader usability
-
-The interface should favor ease of use and understandability over decorative complexity. Users should be able to scan dates, times, locations, event type, and key caveats without learning the site first.
-
-## 4. Page frame
-
-Proposed structural regions:
-
-- site header
-- primary navigation
-- hero or introductory region
-- search and date shortcuts
-- featured content
-- category browsing
-- event lists
-- newsletter or promotional region
-- footer
-
-Each phase should implement only the page regions authorized by `development-phases.md`.
-
-## 5. Header
-
-The eventual header may include:
-
-- logo or wordmark
-- Events
-- Calendar
-- This Weekend
-- Submit an Event
-- search access
-- mobile menu
-
-Before navigation is functional, nonfunctional navigation or controls should be concealed from users rather than presented as working UI.
-
-## 6. Event card anatomy
-
-Recommended order:
-
-1. visual area
-2. category label
+1. vertical or category visual
+2. vertical label
 3. event title
 4. date and time
 5. venue
-6. city or neighborhood
-7. price or audience indicator when useful
+6. city and state
+7. category
+8. price or audience indicator when useful
+9. coverage, featured, promoted, or sponsored disclosure when applicable
 
-Cards should use a consistent image ratio.
+Use consistent image ratios and touch-friendly card interactions.
 
-Potential ratios:
+## Event imagery
 
-- 4:3 for editorial cards
-- 16:9 for featured cards
+Use original imagery when it is high quality, crops safely, has appropriate rights, and improves the placement.
 
-Final ratio should be chosen based on real layouts.
+Use controlled vertical or category art when no image exists, a flyer is too text-heavy, resolution is poor, or the result would create visual chaos.
 
-## 7. Category visual system
+Do not stretch flyers or use flyer text as the only accessible event information.
 
-Each primary category should receive:
+## Typography
 
-- an icon or motif
-- a controlled pattern or illustration
-- a category art key
-- a label
+Prefer a small type system with:
 
-Category differences must not rely on color alone.
+- an industrial or stencil display role where brand-appropriate
+- a readable heading role
+- a highly readable body role
+- clear metadata numerals
+- robust fallbacks
 
-Proposed motifs:
+Known TrampsWorld source typography includes Stencil Std Bold, Benguiat Bk BT Bold, and Rock Salt in existing brand work. Do not assume those files are licensed or available in the application. Use approved web-safe or properly licensed alternatives when needed.
 
-- Art: brush, abstract shape, gallery frame
-- Music: waveform, speaker, note, stage light
-- Food & Drink: plate, glass, citrus, utensils
-- Markets: stall, tote, sunshade, produce
-- Festivals: banner, confetti, pennant
-- Family: playful geometric forms
-- Community: gathering or linked shapes
-- Classes & Workshops: tools, hands, notebook
-- Nightlife: moon, neon geometry, spotlight
-- Outdoors: foothills, sun, leaf, trail
-- Sports: motion lines, court or field markings
-- Wellness: flowing line, breath, water
-- Spiritual: stars, candle, botanical motif
-- Theater & Film: curtain, frame, marquee
-- Other: flexible neutral pattern
-
-Icons should be decorative only when the text label already communicates the category.
-
-Initial implementation may use one shared default artwork treatment for all categories. Category-specific artwork should wait until the visual system is ready for focused design work.
-
-## 8. Event imagery rules
-
-Use original imagery when:
-
-- it is high enough quality
-- crop behavior is acceptable
-- rights and source are appropriate
-- it improves the card
-- the placement is featured or editorially selected
-
-Use category art when:
-
-- no image exists
-- the flyer is too text-heavy
-- the image is low resolution
-- the composition does not crop safely
-- using it would create visual chaos
-
-Do not stretch or distort flyers.
-
-Do not use flyer text as the only accessible event information.
-
-## 9. Typography
-
-Final fonts are undecided.
-
-The temporary wordmark should use a bold serif treatment for `Fresno Events`. It must be implemented as a replaceable design element, not as a final logo decision.
-
-Provisional requirements:
-
-- highly readable body face
-- distinctive but legible display face
-- good numeral clarity
-- clear differentiation between headings and metadata
-- robust fallback stack
-- no dependence on a paid font during prototyping unless approved
-
-Suggested type roles:
-
-- Display
-- Heading
-- Body
-- Metadata
-- Button or label
-
-Avoid excessive font families and weights.
-
-## 10. Color
-
-Final palette is undecided.
-
-Starting palette:
+## Color tokens
 
 ```css
---palette-milky-aquamarine: #037F8C;
---palette-dead-sea: #79DCF2;
---palette-midas-gold: #F2B705;
---palette-elden-ring: #F28705;
---palette-momo-peach: #F27979;
+--brand-orange: #ff9000;
+--brand-black: #000000;
+--brand-white: #ffffff;
+
+--color-background;
+--color-surface;
+--color-surface-raised;
+--color-text;
+--color-text-muted;
+--color-border;
+--color-accent;
+--color-accent-contrast;
+--color-focus;
+--color-success;
+--color-warning;
+--color-error;
 ```
 
-Use Elden Ring `#F28705` as the initial primary/accent color.
+Component styles should use semantic tokens so later brand adjustments do not require broad rewrites.
 
-Provisional palette must include semantic roles rather than arbitrary color names:
+Vertical colors, if added, must remain separate from semantic status colors.
 
-```css
---color-background
---color-surface
---color-surface-raised
---color-text
---color-text-muted
---color-border
---color-accent
---color-accent-contrast
---color-focus
---color-success
---color-warning
---color-error
-```
+## Controls, filters, and search
 
-Category colors, if used, should be separate from semantic system colors.
+State and vertical controls should show current state clearly, support individual removal and clear-all behavior, remain keyboard accessible, persist in URL state where appropriate, and work comfortably on mobile.
 
-Every critical state must have a non-color indicator.
+Search must have an explicit label, clear behavior, and no fake production state.
 
-Implementation should map palette values into semantic tokens. Component styles should reference semantic tokens wherever possible so future palette changes do not require broad component rewrites.
+## Status states
 
-## 11. Spacing
+Loading, empty, filtered-empty, error, expired, canceled, and missing-image states must look intentional and explain the next useful action.
 
-Use a consistent spacing scale.
+## Responsive checks
 
-Example provisional scale:
-
-```css
---space-1: 0.25rem;
---space-2: 0.5rem;
---space-3: 0.75rem;
---space-4: 1rem;
---space-5: 1.5rem;
---space-6: 2rem;
---space-7: 3rem;
---space-8: 4rem;
-```
-
-Codex may use a comparable scale but should document deviations.
-
-## 12. Radius and shadows
-
-Use restrained radius and elevation.
-
-The design should not become a collection of unrelated floating pills.
-
-Recommended roles:
-
-- small radius for tags
-- medium radius for controls
-- larger radius for cards or featured panels
-- subtle shadow only where elevation communicates structure
-
-## 13. Buttons and links
-
-Buttons need:
-
-- clear label
-- hover state
-- focus state
-- active state where relevant
-- disabled state when truly unavailable
-- adequate touch target
-
-Do not use disabled-looking controls as decoration.
-
-Links should look interactive without relying only on color.
-
-## 14. Filter controls
-
-Future filter UI should support:
-
-- obvious current state
-- individual removal
-- clear-all action
-- mobile-friendly opening and closing
-- keyboard navigation
-- visible result count when useful
-- URL persistence
-
-Do not implement functional filters before the phase that explicitly authorizes public filtering.
-
-## 15. Search
-
-Search should feel prominent but not dominate every screen.
-
-Requirements when implemented:
-
-- explicit label
-- helpful placeholder
-- clear button or automatic behavior defined in advance
-- keyboard accessibility
-- empty query behavior
-- clear action
-- no fake search field in production
-
-## 16. Empty, loading, and error states
-
-### Loading
-
-Use restrained progress feedback.
-
-Avoid layout jumps.
-
-### No events
-
-Explain whether:
-
-- no events exist in the date range
-- filters removed all results
-- search returned no matches
-
-Provide a useful next action.
-
-### Error
-
-Explain that events could not be loaded without exposing technical details.
-
-Allow retry when appropriate.
-
-## 17. Responsive breakpoints
-
-Use content-driven breakpoints rather than device-brand targets.
-
-Minimum visual checks:
+Minimum checks:
 
 - 320px
 - 375px
@@ -346,45 +138,14 @@ Minimum visual checks:
 - 1024px
 - 1440px
 
-No horizontal page scrolling at 320px.
+No horizontal page scrolling at 320px. Controls and cards must remain readable at 200% zoom.
 
-Cards and controls must remain readable at 200% zoom.
+## Accessibility
 
-## 18. Accessibility details
+Use visible focus, logical tab order, comfortable touch targets, semantic collections, logical heading order, appropriate icon labels, reduced-motion support, screen-reader-friendly dates, sufficient contrast, and no hover-only information.
 
-- visible focus ring
-- logical tab order
-- minimum comfortable touch targets
-- semantic lists for event collections
-- headings in logical hierarchy
-- icons with appropriate labels or hidden semantics
-- motion reduced under `prefers-reduced-motion`
-- dates available in screen-reader-friendly text
-- contrast checked for text and controls
-- no hover-only information
+## Approval boundaries
 
-## 19. Public copy and sample content
+Codex may adapt existing components to TrampsWorld tokens, build reusable vertical visuals, improve responsive behavior, and preserve accessibility.
 
-Reader-facing views should use real approved event data once live data integration is authorized.
-
-Avoid lorem ipsum.
-
-If sample copy is ever used for documentation, tests, or offline development, it must be clearly labeled as sample content and must not be presented as real current events.
-
-## 20. Design approval boundaries
-
-Codex may:
-
-- implement documented provisional tokens
-- create reusable card and layout structure
-- build shared default category-art placeholders
-- ensure responsive behavior
-
-Codex may not:
-
-- declare the brand identity final
-- invent a permanent logo
-- purchase or add paid fonts
-- select final category taxonomy
-- redesign product scope
-- add promotional or sponsor styling ahead of its phase
+Codex may not invent a final logo, add paid fonts, redefine the four verticals, create sponsor styling before its task, or redesign product scope without approval.

@@ -2,201 +2,116 @@
 
 Last updated: 2026-07-13
 
-## Implemented
+## Repository origin
 
-- Google Calendar events are retrieved through the server-side Cloudflare Worker only.
-- The public app renders a real event-discovery agenda using normalized Google Calendar data.
-- The default event feed now imports a bounded long-range window of roughly one year so the primary calendar has the rest of the current Google Calendar feed available.
-- Agenda sections are:
-  - Today
-  - This Weekend
-  - Upcoming
-- Upcoming means the remainder of the current month, unless fewer than seven days remain, then the next seven days.
-- Recurring event instances are expanded by the Google Calendar API using `singleEvents=true` and rendered as individual occurrences.
-- Explicit Flyer2Calendar-style weekly recurrence notes are also expanded when Google Calendar returns a long single event with:
-  - `Type: recurring_event`
-  - `Recurrence note: ... weekly, start-end time`
-- Expanded recurrence-note occurrences are clipped to the requested API range.
-- Canceled events are excluded from normal display.
-- All-day and multi-day events are represented in the normalized event model and displayed with explicit labels.
-- Event descriptions are reduced to safe plain text; upstream HTML is not injected into React.
-- Structured metadata blocks are parsed from Google Calendar descriptions and removed from public descriptions.
-- Delimiter-free calendar description metadata is parsed for the current feed format when it uses recognized key/value lines such as `Type`, `Category`, `Organizer`, `Cost/tickets`, `URL/contact`, and `Recurrence note`.
-- Public source links come only from explicit event metadata, not from the Google Calendar `htmlLink`.
-- The current visual foundation includes:
-  - temporary bold-serif `Fresno Events` wordmark
-  - provisional palette using Elden Ring `#F28705` as the accent color
-  - shared default date/category artwork
-  - responsive event cards
-  - mobile-first layout
-- Public browsing filters are implemented client-side over the loaded event range:
-  - keyword search
-  - date window
-  - category
-  - city
-  - neighborhood
-  - audience
-  - price
-  - active filter chips
-  - clear-all behavior
-  - URL query state
-- A FullCalendar-powered Calendar browse view is implemented alongside Agenda view.
-- Calendar view includes:
-  - month view
-  - list view
-  - date navigation
-  - event links to detail pages
-  - keyboard-navigable event interactions in both month and list views
-  - selected filter support
-  - no duplicate events by normalized event ID
-- Agenda view uses the documented Today, This Weekend, and Upcoming windows.
-- Agenda sections are literal date windows. An event may appear in more than one agenda section when the displayed ranges overlap, such as an event that is both Today and This Weekend.
-- Calendar view time scope is controlled by the currently displayed FullCalendar month/list range, not by the Agenda date-window filter.
-- Calendar view applies only facet filters:
-  - category
-  - city
-  - neighborhood
-  - audience
-  - price
-- Agenda-only search and Today/This Weekend/Upcoming state are hidden and ignored while Calendar view is active.
-- Event detail pages are implemented at stable `/events/:slug--encodedId` paths.
-- Event detail pages include:
-  - full plain-text event information
-  - event date/time
-  - venue and location details when provided
-  - map links when enough location data exists
-  - official, registration, and website links when provided
-  - Add to Google Calendar link
-  - downloadable `.ics`
-  - copy/share controls
-  - structured event data
-  - client-side title, canonical, and Open Graph metadata updates
-- The Worker serves event-detail app-shell responses with event-specific metadata when the event is present in the current feed.
-- A unified corrections and event-lead contact flow is implemented at `/contact`, with `/submit` serving the same intake page.
-- The contact flow prepares a reader-reviewed email draft through `POST /api/contact-draft`.
-- The contact recipient is read server-side from `FRESNO_EVENTS_CONTACT_EMAIL`; the address is not rendered into the page or bundled client code.
-- Event leads sent through the contact flow are editorial leads only. They are not stored, moderated in-app, confirmed by email, or published automatically.
-- Automated tests currently cover:
-  - metadata parsing
-  - delimiter-free calendar metadata parsing
-  - date range logic
-  - event normalization
-  - recurrence-note expansion and API-range clipping
-  - agenda section grouping
-  - overlapping agenda-window membership
-  - FullCalendar event mapping
-  - Calendar-specific filter behavior
-  - public filters
-  - event detail helper behavior
-  - contact draft generation and controlled contact API errors
+This repository is an independent snapshot cloned from the working Fresno Events application. The copied repository begins with a new initial commit rather than preserving Fresno Events commit history. This is acceptable for the TrampsWorld sibling project.
+
+## Implemented and inherited
+
+The application already includes:
+
+- server-side Google Calendar retrieval through a Cloudflare Worker
+- bounded long-range event loading
+- recurring instance expansion
+- conservative Flyer2Calendar-style recurrence-note expansion
+- canceled-event exclusion
+- all-day and multi-day handling
+- safe plain-text descriptions
+- structured and delimiter-free metadata parsing
+- stable normalized occurrence IDs
+- responsive Agenda view
+- Today, This Weekend, and Upcoming sections
+- keyword search
+- date, category, city, neighborhood, audience, and price filters
+- active filter chips and clear-all behavior
+- URL query state
+- FullCalendar month and list views
+- event detail pages
+- map, source, registration, and website links when provided
+- Add to Google Calendar
+- `.ics` download
+- copy and share controls
+- structured event data and Open Graph support
+- corrections and event-lead contact handoff
+- automated tests covering normalization, metadata, date ranges, filters, calendar mapping, details, recurrence, and contact behavior
 
 ## Current architecture
 
-- Stack:
-  - TypeScript
-  - React
-  - Vite
-  - Luxon
-  - FullCalendar
-  - Cloudflare Workers with Static Assets
-  - Vitest
-- Worker entry point:
-  - `worker/index.ts`
-- Static assets:
-  - built into `dist/`
-  - served through the `ASSETS` binding
-  - `wrangler.jsonc` uses `run_worker_first: true` so the Worker can handle API and detail routes before falling through to assets
-- Public event API:
-  - `GET /api/events`
-  - implemented in `worker/routes/events.ts`
-  - validates bounded date ranges
-  - defaults to a bounded long-range feed for the primary calendar
-  - fetches Google Calendar Events list data server-side
-  - requests expanded recurring instances
-  - handles pagination
-  - normalizes events before returning JSON
-- App-shell metadata route:
-  - implemented in `worker/routes/app-shell.ts`
-  - handles `/` and `/events/...`
-  - injects basic title, description, canonical, and Open Graph tags into HTML responses
-  - falls back to default site metadata when an event cannot be resolved
-- Event fetching path:
-  - browser calls `fetchEvents()` in `src/lib/events-api.ts`
-  - `fetchEvents()` requests `/api/events`
-  - Worker validates range, fetches Google Calendar, normalizes events, and returns the public event response
-- Normalization path:
-  - `worker/services/normalize-event.ts`
-  - parses public descriptions and structured metadata
-  - parses the current delimiter-free key/value description format
-  - validates known metadata fields
-  - removes metadata from public descriptions
-  - creates stable occurrence identifiers
-  - expands explicit weekly recurrence-note events returned by Google as long single events
-  - computes all-day and multi-day flags
-  - maps unknown taxonomy values to documented fallbacks
-- Date-range logic:
-  - Worker range validation lives in `worker/lib/date-ranges.ts`
-  - UI agenda grouping lives in `src/lib/agenda-sections.ts`
-  - filter-aware section selection lives in `src/lib/event-filters.ts`
-  - canonical timezone is always `America/Los_Angeles`
-- Event detail helpers:
-  - `src/lib/event-detail.ts`
-  - builds stable detail paths
-  - resolves event IDs from detail URLs
-  - builds Google Calendar links
-  - builds `.ics` content
-  - builds map URLs
-  - builds conservative structured event data
-- Contact flow:
-  - `src/types/contact.ts`
-  - defines contact draft request and response types shared by the browser and Worker
-  - `POST /api/contact-draft`
-  - implemented in `worker/routes/contact.ts`
-  - validates correction versus event-lead intent
-  - requires at least one event detail before preparing a draft
-  - builds a prefilled `mailto:` URL with the recipient from Worker environment only
-  - returns controlled JSON errors when the contact recipient is not configured
+- TypeScript
+- React
+- Vite
+- Luxon
+- FullCalendar
+- Cloudflare Workers with Static Assets
+- Vitest
 
-## Known issues
+The browser calls `/api/events`. The Worker validates the request, fetches Google Calendar, normalizes events, and returns the public schema.
 
-- Event detail pages can resolve only events included in the current default event feed. Old, expired, or out-of-range event URLs show the current "Event not found" state.
-- Event-detail app-shell metadata currently requires loading the current default event feed to resolve a detail URL. This is acceptable for the current implementation but should be revisited before production traffic, likely with caching or a more targeted lookup.
-- The default feed is broader now, but it is still intentionally bounded rather than an unlimited import of all historical and future Google Calendar data.
-- Recurrence-note expansion is intentionally conservative. It currently supports explicit weekly notes with a recognizable weekday and time range. Other prose recurrence patterns should be corrected in Google Calendar or given documented metadata before the site expands them.
-- City and neighborhood filters depend on explicit metadata or conservative known-place extraction from Google Calendar locations. They will improve as event metadata becomes more consistent.
-- Sandboxed local Codex runs can return `/api/events` 503 when the sandbox cannot reach Google. An escalated local Worker smoke test returned `/api/events` 200 with live data.
-- Local contact draft smoke tests require `FRESNO_EVENTS_CONTACT_EMAIL` to be available to Wrangler. Automated tests cover the route with a test recipient, but the latest sandbox approval layer rejected restarting Wrangler with a temporary env file for a live contact endpoint smoke.
-- The contact flow is a mailto handoff. It keeps the recipient out of rendered HTML and bundled client code, but it is not a full server-side email relay and should not be treated as spam-proof or impossible to probe.
-- Production deployment, custom domain configuration, production secrets, and production cache policy have not been completed.
-- Final brand identity, final logo, and final category-specific artwork are not complete.
-- Stored event submissions, organizer accounts, newsletter integration, analytics, sponsorship tooling, payments, confirmation emails, moderation queues, spam controls, and database-backed editorial tooling have not been implemented.
-- `docs/working-state.md` itself is currently a working-state reference and should be updated whenever a phase materially changes the implementation.
+## Current inherited technical debt
+
+The repository still contains Fresno-specific assumptions, including some or all of:
+
+- `Fresno Events` public copy
+- `fresno-events` project and Worker naming
+- `FRESNO_EVENTS_CONTACT_EMAIL`
+- `America/Los_Angeles` as the canonical site timezone
+- Fresno-centered categories and location language
+- Fresno-specific default metadata and canonical assumptions
+- tests and fixtures written around Fresno behavior
+- provisional Fresno visual styling
+
+These should be replaced deliberately during the conversion phase, not through an unreviewed global replacement.
+
+## Current TrampsWorld decisions
+
+- Initial states: Arizona, California, Nevada, and New Mexico.
+- Initial verticals: HotRodTramp, CycleTramp, RiverTramp, and DirtTramp.
+- State and vertical are separate first-class event facets.
+- Google Calendar remains the initial editorial source of truth.
+- Real calendar data is preferred over fictional public fixtures.
+- The existing Agenda, Calendar, filters, detail pages, sharing, and contact flow should be preserved.
+- The initial site reference timezone is `America/Phoenix`.
+- Timed events should preserve event-local time information when available.
+- All-day dates must remain date-only.
+- TrampsWorld orange is `#ff9000`; black is `#000000`.
+- Existing approved TrampsWorld logos and assets take precedence over invented branding.
+- Public source links must come from explicit metadata, not Google Calendar internals.
+- Upstream HTML must not be injected directly.
+- Unknown state and vertical must remain valid fallbacks.
 
 ## Current task
 
-- Current active task: Phase 6 corrections contact flow with a limited event-lead email handoff.
-- Phase 5 full calendar work is implemented and stable enough for Phase 6 editorial enhancement slices.
-- Future Phase 6 editorial enhancement items still require individual task authorization and acceptance criteria before implementation.
-- A fuller Phase 7 event submission system still requires an architecture decision for storage, moderation, spam controls, and confirmation emails.
+The next authorized implementation should be Phase B: TrampsWorld conversion.
 
-## Decisions already made
+That slice should:
 
-- America/Los_Angeles is the canonical timezone.
-- Google Calendar is the current event source.
-- Agenda browsing is a primary experience.
-- Real calendar data is preferred over fictional public fixture data.
-- Google Calendar credentials and calendar identifiers must remain server-side.
-- The public UI must not invent missing event facts.
-- Public source links must come from explicit event metadata, not Google Calendar internals.
-- Upstream descriptions must not be rendered as raw HTML.
-- The public browsing sections are Today, This Weekend, and Upcoming.
-- Upcoming means the remainder of the current month, unless fewer than seven days remain, then the next seven days.
-- Nonfunctional controls should remain concealed until their behavior is implemented.
-- The temporary wordmark is text-based: `Fresno Events` in a bold serif style.
-- The current palette is provisional and should remain easy to change.
-- Detail route stability depends on the normalized event occurrence ID, not the title slug.
-- The primary calendar should be completed and stable before Phase 6 editorial growth features are added.
-- Corrections and early event leads may share a single contact intake when they remain email-based and do not store, moderate, confirm, or auto-publish submissions.
-- The Fresno Events contact recipient should be configured through `FRESNO_EVENTS_CONTACT_EMAIL`, not committed into client code.
-- `docs/working-state.md` should be updated as the final step of future implementation tasks.
-- Do not revisit these decisions unless new evidence creates a conflict.
+- rename public and internal Fresno-specific project identity where appropriate
+- add first-class state and vertical metadata, normalization, display, and filtering
+- update the timezone strategy
+- apply provisional TrampsWorld copy and tokens
+- update tests
+- preserve inherited behavior
+- update this working-state file
+- stop before deployment and before additional media, sponsor, database, account, or payment features
+
+## Known issues to verify during conversion
+
+- Event details only resolve events inside the loaded feed range.
+- App-shell metadata currently loads the default feed to resolve event routes.
+- Recurrence-note expansion supports only conservative weekly prose patterns.
+- Existing city and neighborhood extraction depends on metadata and known-place logic.
+- Contact flow remains a mailto handoff, not a server-side relay.
+- Production caching policy may still need explicit review.
+- The cloned repository has not yet been deployed independently.
+- The cloned repository may still use Fresno-specific Worker and environment names.
+
+## Do not revisit without new evidence
+
+- Google Calendar as the initial source
+- server-side credentials
+- safe description handling
+- stable occurrence IDs
+- Agenda as a primary experience
+- FullCalendar as an alternate experience
+- state and vertical as separate facets
+- independent TrampsWorld deployment rather than sharing Fresno production configuration
