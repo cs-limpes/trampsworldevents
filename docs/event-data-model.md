@@ -2,7 +2,11 @@
 
 ## Purpose
 
-This document defines the normalized public event model and the structured metadata expected from Google Calendar descriptions. It extends the inherited Fresno Events model with first-class state and vertical fields.
+This document defines the normalized public event model and the structured metadata expected from Google Calendar descriptions.
+
+It extends the inherited Fresno Events model with first-class state and vertical fields.
+
+The model belongs to the event application only. It does not model the broader TrampsWorld websites, media library, sponsorship CRM, merchandise, or business operations.
 
 ## Normalized event type
 
@@ -81,8 +85,6 @@ export type PublicEvent = {
     sourceUrl?: string
     registrationUrl?: string
     websiteUrl?: string
-    videoUrl?: string
-    galleryUrl?: string
   }
 
   editorial: {
@@ -90,7 +92,6 @@ export type PublicEvent = {
     promoted: boolean
     sponsored: boolean
     sponsorName?: string
-    coverageStatus?: 'none' | 'planned' | 'published'
   }
 
   accessibility?: {
@@ -104,9 +105,15 @@ export type PublicEvent = {
 
 The implementation may evolve, but state and vertical must remain separate first-class values.
 
+A later event-specific task may add one approved outbound related-coverage link. Do not preemptively model a TrampsWorld media library, gallery system, content relationship graph, or coverage workflow.
+
 ## Identifiers
 
-The public ID must identify an individual occurrence. Recurring events should combine source identity with original occurrence start. Titles are not authoritative identifiers.
+The public ID must identify an individual event occurrence.
+
+Recurring events should combine source identity with original occurrence start.
+
+Titles are not authoritative identifiers.
 
 ## States
 
@@ -118,7 +125,11 @@ Accepted values:
 - `NM`
 - `unknown`
 
-Normalize full state names to their abbreviations. Invalid or missing values become `unknown`. Do not guess solely from a calendar name.
+Normalize full state names to their abbreviations.
+
+Invalid or missing values become `unknown`.
+
+Do not guess solely from a calendar name, referring website, or selected vertical.
 
 ## Verticals
 
@@ -130,7 +141,11 @@ Accepted values:
 - `dirttramp`
 - `unclassified`
 
-Vertical assignment should come from explicit metadata or a documented conservative classification rule. Ambiguous events remain `unclassified`.
+Vertical assignment should come from explicit metadata or a documented conservative classification rule.
+
+Ambiguous events remain `unclassified`.
+
+A prefiltered entry URL does not rewrite an event's vertical. It only filters the already normalized data.
 
 ## Categories
 
@@ -154,9 +169,18 @@ export type EventCategory =
 
 Unknown values normalize to `other`.
 
+Categories and verticals are separate:
+
+- category describes what kind of event it is,
+- vertical describes the primary TrampsWorld audience or lane.
+
 ## Audience and price
 
-Retain the inherited audience and price behavior unless a later task changes it. Missing price is `unknown`, never automatically free. Registration required does not imply paid.
+Retain the inherited audience and price behavior unless a later task changes it.
+
+Missing price is `unknown`, never automatically free.
+
+Registration required does not imply paid.
 
 ## Description metadata
 
@@ -178,11 +202,11 @@ featured: false
 promoted: false
 sponsored: false
 source: https://example.com/event
-video: https://youtube.com/example
-gallery: https://example.com/gallery
 ```
 
-Existing delimiter-free Flyer2Calendar metadata may continue to be parsed when recognized. Migration should not break currently working feeds.
+Existing delimiter-free Flyer2Calendar metadata may continue to be parsed when recognized.
+
+Migration should not break currently working feeds.
 
 ## Allowed metadata keys
 
@@ -215,9 +239,6 @@ Initial keys include:
 - `organizer`
 - `organizer_url`
 - `accessibility`
-- `video`
-- `gallery`
-- `coverage_status`
 
 Unknown keys should be ignored and optionally logged in development.
 
@@ -246,9 +267,11 @@ Unknown keys should be ignored and optionally logged in development.
 
 ## Dates and timezones
 
-Timed events should preserve source offsets or IANA timezone information. All-day event dates remain date-only and use an exclusive end date.
+Timed events should preserve source offsets or IANA timezone information.
 
-The site reference timezone may be `America/Phoenix`, but event-local display must not silently convert all event times to Phoenix time.
+All-day event dates remain date-only and use an exclusive end date.
+
+The configurable site reference timezone may be `America/Phoenix`, but event-local display must not silently convert all event times to Phoenix time.
 
 Tests must cover:
 
@@ -259,10 +282,50 @@ Tests must cover:
 - all-day events without timezone drift
 - multi-day events spanning local midnight
 
+## URL filter state
+
+URL query parameters describe the visitor's current browsing state. They are not part of the authoritative event record.
+
+Supported values should use canonical slugs, for example:
+
+```text
+?vertical=cycletramp
+?state=AZ
+```
+
+Unknown query values must be ignored or handled with a controlled neutral state.
+
+A URL filter must never mutate event metadata.
+
 ## Duplicate and cancellation behavior
 
-Collapse only exact source occurrence duplicates automatically. Similar titles and times are not enough to delete an event. Canceled events should not appear as active.
+Collapse only exact source occurrence duplicates automatically.
+
+Similar titles and times are not enough to delete an event.
+
+Canceled events should not appear as active.
 
 ## Test fixtures
 
-Include fixtures for each state, each vertical, unknown state, unclassified vertical, timed, all-day, multi-day, recurring, modified, canceled, free, paid, unknown price, missing venue, missing image, long title, flyer, online event, featured event, sponsored event, and events with related video or gallery metadata.
+Include fixtures for:
+
+- each state
+- each vertical
+- unknown state
+- unclassified vertical
+- timed event
+- all-day event
+- multi-day event
+- recurring event
+- modified occurrence
+- canceled occurrence
+- free event
+- paid event
+- unknown price
+- missing venue
+- missing image
+- long title
+- flyer
+- online event
+- featured event
+- sponsored event
