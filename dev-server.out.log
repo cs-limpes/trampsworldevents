@@ -60,3 +60,58 @@ env.TRAMPSWORLD_EVENTS_CONTACT_EMAIL ("(hidden)")      Environment Variable     
 [wrangler:info] GET /assets/index-CFbPm-To.js 304 Not Modified (8ms)
 [wrangler:info] GET /assets/index-BXc3SC3Y.css 304 Not Modified (8ms)
 [wrangler:info] GET /api/events 200 OK (948ms)
+[wrangler:info] GET /events/meet-and-greet-tbd--89nffo72hsp3g6npbb0oc59hvg 200 OK (958ms) `Sec-Fetch-Mode: navigate` header present - using `not_found_handling` behavior
+[wrangler:info] GET /assets/index-CFbPm-To.js 304 Not Modified (8ms)
+[wrangler:info] GET /assets/index-BXc3SC3Y.css 304 Not Modified (11ms)
+[wrangler:info] GET /api/events 200 OK (630ms)
+[wrangler:info] GET /events/main-street-cruise--ajm6jnq5njm035h0qaeg49brds_20260730T230000Z-20260730T1600000700 200 OK (1002ms) `Sec-Fetch-Mode: navigate` header present - using `not_found_handling` behavior
+[wrangler:info] GET /assets/index-CFbPm-To.js 304 Not Modified (8ms)
+[wrangler:info] GET /assets/index-BXc3SC3Y.css 304 Not Modified (29ms)
+[wrangler:info] GET /api/events 200 OK (653ms)
+[wrangler:info] GET / 200 OK (55ms)
+[wrangler:info] GET /assets/index-CFbPm-To.js 304 Not Modified (28ms)
+[wrangler:info] GET /assets/index-BXc3SC3Y.css 304 Not Modified (23ms)
+[wrangler:info] GET /api/events 200 OK (943ms)
+[wrangler:info] GET /events/east-valley-cruisers-friday-cruise-in--223lserh8krebjr1vdv4uu25h0_20260717T210000Z-20260717T1400000700 200 OK (665ms) `Sec-Fetch-Mode: navigate` header present - using `not_found_handling` behavior
+[wrangler:info] GET /assets/index-CFbPm-To.js 304 Not Modified (7ms)
+[wrangler:info] GET /assets/index-BXc3SC3Y.css 304 Not Modified (17ms)
+[wrangler:info] GET /api/events 200 OK (871ms)
+Constructing a Response with a null body status (304) and a non-null, zero-length body. This is technically incorrect, and we recommend you update your code to explicitly pass in a `null` body, e.g. `new Response(null, { status: 304, ... })`. (We continue to allow the zero-length body behavior because it was previously the only way to construct a Response with a null body status. This behavior may change in the future.)
+[wrangler:info] GET / 304 Not Modified (86ms)
+[wrangler:info] GET /assets/index-CFbPm-To.js 304 Not Modified (10ms)
+[wrangler:info] GET /assets/index-BXc3SC3Y.css 304 Not Modified (11ms)
+[wrangler:info] GET /api/events 200 OK (965ms)
+[wrangler:info] GET / 200 OK (8ms)
+[wrangler:info] GET /assets/index-CFbPm-To.js 200 OK (21ms)
+[wrangler:info] GET /assets/index-BXc3SC3Y.css 200 OK (42ms)
+[wrangler:info] GET /favicon.ico 200 OK (7ms) `Sec-Fetch-Mode: navigate` header present - using `not_found_handling` behavior
+[wrangler:info] GET /api/events 200 OK (957ms)
+[wrangler:info] GET / 200 OK (13ms)
+[wrangler:info] GET /assets/index-CFbPm-To.js 200 OK (7ms)
+[wrangler:info] GET /assets/index-BXc3SC3Y.css 200 OK (9ms)
+[wrangler:info] GET /favicon.ico 200 OK (7ms) `Sec-Fetch-Mode: navigate` header present - using `not_found_handling` behavior
+[wrangler:info] GET /api/events 200 OK (838ms)
+⎔ Reloading local server...
+⎔ Local server updated and ready
+⎔ Reloading local server...
+⎔ Local server updated and ready
+[wrangler:info] GET / 200 OK (135ms)
+[wrangler:info] GET /assets/index-NnNV1qXm.js 200 OK (211ms)
+[wrangler:info] GET /assets/index-tI7lUA5Q.css 200 OK (230ms)
+[wrangler:info] GET /favicon.ico 200 OK (5ms) `Sec-Fetch-Mode: navigate` header present - using `not_found_handling` behavior
+[wrangler:info] GET /api/events 200 OK (1193ms)
+[wrangler:info] GET /events/east-valley-cruisers-friday-cruise-in--223lserh8krebjr1vdv4uu25h0_20260807T210000Z-20260807T1400000700 200 OK (1107ms) `Sec-Fetch-Mode: navigate` header present - using `not_found_handling` behavior
+[wrangler:info] GET /assets/index-NnNV1qXm.js 304 Not Modified (7ms)
+[wrangler:info] GET /assets/index-tI7lUA5Q.css 304 Not Modified (8ms)
+[wrangler:info] GET /api/events 200 OK (678ms)
+Using secrets defined in .dev.vars
+Your Worker has access to the following bindings:
+Binding                                                Resource                  Mode
+env.ASSETS                                             Assets                    local
+env.GOOGLE_CALENDAR_ID ("(hidden)")                    Environment Variable      local
+env.GOOGLE_CALENDAR_API_KEY ("(hidden)")               Environment Variable      local
+env.GOOGLE_CALENDAR_TIMEZONE ("(hidden)")              Environment Variable      local
+env.TRAMPSWORLD_EVENTS_CONTACT_EMAIL ("(hidden)")      Environment Variable      local
+
+⎔ Reloading local server...
+⎔ Local server updated and ready
