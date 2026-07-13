@@ -95,7 +95,8 @@ export function App() {
       <header className="site-header">
         <div className="masthead">
           <a className="wordmark" href="/">
-            TrampsWorld Events
+            <img src="https://i0.wp.com/trampsworld.com/wp-content/uploads/2026/05/cropped-TheTrampsWorld-on-Clear.png" alt="TrampsWorld" />
+            <span>Events</span>
           </a>
           <p className="eyebrow">Today, This Weekend, and Upcoming</p>
         </div>

@@ -29,3 +29,34 @@ env.TRAMPSWORLD_EVENTS_CONTACT_EMAIL ("(hidden)")      Environment Variable     
 
 ⎔ Starting local server...
 [wrangler:info] Ready on http://127.0.0.1:8789
+[wrangler:info] GET /api/events 200 OK (1824ms)
+[wrangler:info] GET / 200 OK (157ms)
+[wrangler:info] GET / 200 OK (78ms)
+[wrangler:info] GET /assets/index-CFbPm-To.js 200 OK (237ms)
+[wrangler:info] GET /assets/index-BXc3SC3Y.css 200 OK (275ms)
+[wrangler:info] GET /favicon.ico 200 OK (21ms) `Sec-Fetch-Mode: navigate` header present - using `not_found_handling` behavior
+[wrangler:info] GET /api/events 200 OK (1055ms)
+[wrangler:info] GET /events/international-food-music-festival--cplsij91e6skr57jv0f2miocfs 200 OK (1168ms) `Sec-Fetch-Mode: navigate` header present - using `not_found_handling` behavior
+[wrangler:info] GET /assets/index-CFbPm-To.js 304 Not Modified (8ms)
+[wrangler:info] GET /assets/index-BXc3SC3Y.css 304 Not Modified (11ms)
+[wrangler:info] GET /api/events 200 OK (820ms)
+[wrangler:info] GET / 200 OK (9ms)
+[wrangler:info] GET /assets/index-CFbPm-To.js 304 Not Modified (44ms)
+[wrangler:info] GET /assets/index-BXc3SC3Y.css 304 Not Modified (15ms)
+[wrangler:info] GET /api/events 200 OK (1465ms)
+[wrangler:info] GET /events/night-of-destruction--p2uf30tnu9nuocmbiaja4e0gm4 200 OK (1109ms) `Sec-Fetch-Mode: navigate` header present - using `not_found_handling` behavior
+[wrangler:info] GET /assets/index-CFbPm-To.js 304 Not Modified (9ms)
+[wrangler:info] GET /assets/index-BXc3SC3Y.css 304 Not Modified (11ms)
+[wrangler:info] GET /api/events 200 OK (671ms)
+[wrangler:info] GET /events/east-valley-cruisers-friday-cruise-in--223lserh8krebjr1vdv4uu25h0_20260717T210000Z-20260717T1400000700 200 OK (1008ms) `Sec-Fetch-Mode: navigate` header present - using `not_found_handling` behavior
+[wrangler:info] GET /assets/index-CFbPm-To.js 304 Not Modified (8ms)
+[wrangler:info] GET /assets/index-BXc3SC3Y.css 304 Not Modified (12ms)
+[wrangler:info] GET /api/events 200 OK (581ms)
+[wrangler:info] GET /events/main-street-cruise--ajm6jnq5njm035h0qaeg49brds_20260716T230000Z-20260716T1600000700 200 OK (917ms) `Sec-Fetch-Mode: navigate` header present - using `not_found_handling` behavior
+[wrangler:info] GET /assets/index-CFbPm-To.js 304 Not Modified (7ms)
+[wrangler:info] GET /assets/index-BXc3SC3Y.css 304 Not Modified (10ms)
+[wrangler:info] GET /api/events 200 OK (759ms)
+[wrangler:info] GET / 200 OK (9ms)
+[wrangler:info] GET /assets/index-CFbPm-To.js 304 Not Modified (8ms)
+[wrangler:info] GET /assets/index-BXc3SC3Y.css 304 Not Modified (8ms)
+[wrangler:info] GET /api/events 200 OK (948ms)
