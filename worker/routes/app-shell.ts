@@ -6,6 +6,11 @@ import {
 import type { PublicEvent } from '../../src/types/events'
 import { loadEventsResponse, type Env } from './events'
 
+const SOCIAL_IMAGE_PATH = '/img/scampworldsmall.png'
+const SOCIAL_IMAGE_ALT = 'TrampsWorld Events'
+const SOCIAL_IMAGE_WIDTH = '400'
+const SOCIAL_IMAGE_HEIGHT = '405'
+
 export async function handleAppShellRequest(request: Request, env: Env): Promise<Response> {
   const indexResponse = await env.ASSETS.fetch(request)
 
@@ -35,6 +40,7 @@ type PageMetadata = {
   description: string
   url: string
   type: string
+  imageUrl: string
 }
 
 async function findEventForShell(pathname: string, origin: string, env: Env): Promise<PublicEvent | undefined> {
@@ -53,6 +59,7 @@ function buildEventMetadata(event: PublicEvent, origin: string): PageMetadata {
     description: getEventSummary(event),
     url: getEventCanonicalUrl(event, origin),
     type: 'article',
+    imageUrl: buildSocialImageUrl(origin),
   }
 }
 
@@ -62,6 +69,7 @@ function buildDefaultMetadata(url: URL): PageMetadata {
     description: 'A live regional agenda for Arizona, California, Nevada, and New Mexico.',
     url: `${url.origin}${url.pathname}`,
     type: 'website',
+    imageUrl: buildSocialImageUrl(url.origin),
   }
 }
 
@@ -71,6 +79,7 @@ function buildContactMetadata(url: URL): PageMetadata {
     description: 'Send TrampsWorld Events a correction or a new event lead for editorial review.',
     url: `${url.origin}${url.pathname}`,
     type: 'website',
+    imageUrl: buildSocialImageUrl(url.origin),
   }
 }
 
@@ -87,12 +96,22 @@ function injectMetadata(html: string, metadata: PageMetadata): string {
     `<meta property="og:description" content="${escapeHtml(metadata.description)}" />`,
     `<meta property="og:type" content="${escapeHtml(metadata.type)}" />`,
     `<meta property="og:url" content="${escapeHtml(metadata.url)}" />`,
-    `<meta name="twitter:card" content="summary" />`,
+    `<meta property="og:image" content="${escapeHtml(metadata.imageUrl)}" />`,
+    `<meta property="og:image:width" content="${SOCIAL_IMAGE_WIDTH}" />`,
+    `<meta property="og:image:height" content="${SOCIAL_IMAGE_HEIGHT}" />`,
+    `<meta property="og:image:alt" content="${escapeHtml(SOCIAL_IMAGE_ALT)}" />`,
+    `<meta name="twitter:card" content="summary_large_image" />`,
+    `<meta name="twitter:image" content="${escapeHtml(metadata.imageUrl)}" />`,
+    `<meta name="twitter:image:alt" content="${escapeHtml(SOCIAL_IMAGE_ALT)}" />`,
     `<link rel="canonical" href="${escapeHtml(metadata.url)}" />`,
   ].join('\n    ')
 
   const withoutTitle = html.replace(/<title>[\s\S]*?<\/title>/i, '')
   return withoutTitle.replace('</head>', `    ${tags}\n  </head>`)
+}
+
+function buildSocialImageUrl(origin: string): string {
+  return new URL(SOCIAL_IMAGE_PATH, origin).toString()
 }
 
 function isHtmlResponse(response: Response): boolean {

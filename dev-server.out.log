@@ -115,3 +115,88 @@ env.TRAMPSWORLD_EVENTS_CONTACT_EMAIL ("(hidden)")      Environment Variable     
 
 ⎔ Reloading local server...
 ⎔ Local server updated and ready
+Using secrets defined in .dev.vars
+Your Worker has access to the following bindings:
+Binding                                                Resource                  Mode
+env.ASSETS                                             Assets                    local
+env.GOOGLE_CALENDAR_ID ("(hidden)")                    Environment Variable      local
+env.GOOGLE_CALENDAR_API_KEY ("(hidden)")               Environment Variable      local
+env.GOOGLE_CALENDAR_TIMEZONE ("(hidden)")              Environment Variable      local
+env.TRAMPSWORLD_EVENTS_CONTACT_EMAIL ("(hidden)")      Environment Variable      local
+
+⎔ Reloading local server...
+⎔ Local server updated and ready
+[wrangler:info] GET / 200 OK (315ms)
+[wrangler:info] GET /assets/index-NnNV1qXm.js 304 Not Modified (10ms)
+[wrangler:info] GET /assets/index-tI7lUA5Q.css 200 OK (25ms)
+[wrangler:info] GET /favicon.ico 200 OK (319ms) `Sec-Fetch-Mode: navigate` header present - using `not_found_handling` behavior
+[wrangler:info] GET /api/events 200 OK (1874ms)
+[wrangler:info] GET / 200 OK (7ms)
+[wrangler:info] GET /assets/index-NnNV1qXm.js 304 Not Modified (9ms)
+[wrangler:info] GET /assets/index-tI7lUA5Q.css 304 Not Modified (11ms)
+[wrangler:info] GET /api/events 200 OK (1049ms)
+⎔ Reloading local server...
+⎔ Local server updated and ready
+⎔ Reloading local server...
+⎔ Local server updated and ready
+[wrangler:info] GET / 200 OK (131ms)
+[wrangler:info] GET /assets/index-Dbm30Uy_.js 200 OK (248ms)
+[wrangler:info] GET /assets/index-tI7lUA5Q.css 200 OK (265ms)
+[wrangler:info] GET /favicon.ico 200 OK (8ms) `Sec-Fetch-Mode: navigate` header present - using `not_found_handling` behavior
+[wrangler:info] GET /api/events 200 OK (1123ms)
+[wrangler:info] GET / 200 OK (13ms)
+[wrangler:info] GET /assets/index-Dbm30Uy_.js 200 OK (7ms)
+[wrangler:info] GET /assets/index-tI7lUA5Q.css 200 OK (13ms)
+[wrangler:info] GET /favicon.ico 200 OK (11ms) `Sec-Fetch-Mode: navigate` header present - using `not_found_handling` behavior
+[wrangler:info] GET /api/events 200 OK (860ms)
+Constructing a Response with a null body status (304) and a non-null, zero-length body. This is technically incorrect, and we recommend you update your code to explicitly pass in a `null` body, e.g. `new Response(null, { status: 304, ... })`. (We continue to allow the zero-length body behavior because it was previously the only way to construct a Response with a null body status. This behavior may change in the future.)
+[wrangler:info] GET / 304 Not Modified (66ms)
+[wrangler:info] GET /assets/index-Dbm30Uy_.js 304 Not Modified (10ms)
+[wrangler:info] GET /assets/index-tI7lUA5Q.css 304 Not Modified (12ms)
+[wrangler:info] GET /api/events 200 OK (1127ms)
+Constructing a Response with a null body status (304) and a non-null, zero-length body. This is technically incorrect, and we recommend you update your code to explicitly pass in a `null` body, e.g. `new Response(null, { status: 304, ... })`. (We continue to allow the zero-length body behavior because it was previously the only way to construct a Response with a null body status. This behavior may change in the future.)
+[wrangler:info] GET / 304 Not Modified (8ms)
+[wrangler:info] GET /assets/index-Dbm30Uy_.js 304 Not Modified (12ms)
+[wrangler:info] GET /assets/index-tI7lUA5Q.css 304 Not Modified (13ms)
+[wrangler:info] GET /api/events 200 OK (1694ms)
+⎔ Reloading local server...
+⎔ Local server updated and ready
+⎔ Reloading local server...
+⎔ Local server updated and ready
+[wrangler:info] GET / 200 OK (50ms)
+[wrangler:info] GET /assets/index-CRxsx0PJ.js 200 OK (250ms)
+[wrangler:info] GET /assets/index-BWTRUfdU.css 200 OK (266ms)
+[wrangler:info] GET /api/events 200 OK (1157ms)
+⎔ Reloading local server...
+⎔ Local server updated and ready
+⎔ Reloading local server...
+⎔ Local server updated and ready
+[wrangler:info] GET / 200 OK (47ms)
+[wrangler:info] GET /assets/index-Bj5qORRV.js 200 OK (260ms)
+[wrangler:info] GET /assets/index-D5WBCMwK.css 200 OK (278ms)
+[wrangler:info] GET /api/events 200 OK (1190ms)
+[wrangler:info] GET / 200 OK (13ms)
+[wrangler:info] GET /assets/index-Bj5qORRV.js 200 OK (8ms)
+[wrangler:info] GET /assets/index-D5WBCMwK.css 200 OK (12ms)
+[wrangler:info] GET /favicon.ico 200 OK (8ms) `Sec-Fetch-Mode: navigate` header present - using `not_found_handling` behavior
+[wrangler:info] GET /api/events 200 OK (1122ms)
+Constructing a Response with a null body status (304) and a non-null, zero-length body. This is technically incorrect, and we recommend you update your code to explicitly pass in a `null` body, e.g. `new Response(null, { status: 304, ... })`. (We continue to allow the zero-length body behavior because it was previously the only way to construct a Response with a null body status. This behavior may change in the future.)
+[wrangler:info] GET / 304 Not Modified (70ms)
+[wrangler:info] GET /assets/index-Bj5qORRV.js 304 Not Modified (11ms)
+[wrangler:info] GET /assets/index-D5WBCMwK.css 304 Not Modified (13ms)
+[wrangler:info] GET /api/events 200 OK (917ms)
+⎔ Reloading local server...
+⎔ Local server updated and ready
+⎔ Reloading local server...
+⎔ Local server updated and ready
+[wrangler:info] GET / 200 OK (44ms)
+[wrangler:info] GET /assets/index-BdHsGRKX.js 200 OK (231ms)
+[wrangler:info] GET /assets/index-D7Z5Fe2a.css 200 OK (251ms)
+[wrangler:info] GET /api/events 200 OK (964ms)
+Constructing a Response with a null body status (304) and a non-null, zero-length body. This is technically incorrect, and we recommend you update your code to explicitly pass in a `null` body, e.g. `new Response(null, { status: 304, ... })`. (We continue to allow the zero-length body behavior because it was previously the only way to construct a Response with a null body status. This behavior may change in the future.)
+[wrangler:info] GET / 304 Not Modified (15ms)
+[wrangler:info] GET /assets/index-BdHsGRKX.js 304 Not Modified (9ms)
+[wrangler:info] GET /assets/index-D7Z5Fe2a.css 304 Not Modified (11ms)
+[wrangler:info] GET /api/events 200 OK (912ms)
+⎔ Reloading local server...
+⎔ Local server updated and ready

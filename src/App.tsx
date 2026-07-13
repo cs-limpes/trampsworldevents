@@ -51,6 +51,8 @@ const DISPLAY_MODE_OPTIONS: Array<{ value: FilterState['display']; label: string
   { value: 'agenda', label: 'Agenda' },
   { value: 'calendar', label: 'Calendar' },
 ]
+const SOCIAL_IMAGE_PATH = '/img/scampworldsmall.png'
+const SOCIAL_IMAGE_ALT = 'TrampsWorld Events'
 
 export function App() {
   const [state, setState] = useState<LoadState>({ status: 'loading' })
@@ -1063,6 +1065,7 @@ function usePageMetadata(route: AppRoute, event?: PublicEvent): void {
         ? 'Send TrampsWorld Events a correction or a new event lead for editorial review.'
         : 'A live regional agenda for Arizona, California, Nevada, and New Mexico.'
     const url = event ? getEventCanonicalUrl(event, window.location.origin) : `${window.location.origin}${route.pathname}`
+    const imageUrl = new URL(SOCIAL_IMAGE_PATH, window.location.origin).toString()
 
     document.title = title
     upsertMeta('name', 'description', description)
@@ -1070,7 +1073,13 @@ function usePageMetadata(route: AppRoute, event?: PublicEvent): void {
     upsertMeta('property', 'og:description', description)
     upsertMeta('property', 'og:type', event ? 'article' : 'website')
     upsertMeta('property', 'og:url', url)
-    upsertMeta('name', 'twitter:card', 'summary')
+    upsertMeta('property', 'og:image', imageUrl)
+    upsertMeta('property', 'og:image:width', '400')
+    upsertMeta('property', 'og:image:height', '405')
+    upsertMeta('property', 'og:image:alt', SOCIAL_IMAGE_ALT)
+    upsertMeta('name', 'twitter:card', 'summary_large_image')
+    upsertMeta('name', 'twitter:image', imageUrl)
+    upsertMeta('name', 'twitter:image:alt', SOCIAL_IMAGE_ALT)
     upsertCanonical(url)
   }, [event, route.kind, route.pathname])
 }
