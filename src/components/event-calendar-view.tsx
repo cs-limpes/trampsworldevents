@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import listPlugin from '@fullcalendar/list'
@@ -9,10 +9,21 @@ import { getEventDetailPath } from '../lib/event-detail'
 import type { PublicEvent } from '../types/events'
 
 export function EventCalendarView({ events, currentSearch }: { events: PublicEvent[]; currentSearch: string }) {
+  const [calendarView, setCalendarView] = useState(getPreferredCalendarView)
   const calendarEvents = useMemo(
     () => toFullCalendarEvents(events, { getUrl: (event) => `${getEventDetailPath(event)}${currentSearch}` }),
     [currentSearch, events],
   )
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 38rem)')
+    const updateView = () => setCalendarView(mediaQuery.matches ? 'listMonth' : 'dayGridMonth')
+
+    updateView()
+    mediaQuery.addEventListener('change', updateView)
+
+    return () => mediaQuery.removeEventListener('change', updateView)
+  }, [])
 
   return (
     <section className="calendar-shell" aria-labelledby="calendar-heading">
@@ -28,8 +39,9 @@ export function EventCalendarView({ events, currentSearch }: { events: PublicEve
 
       <div className="calendar-surface">
         <FullCalendar
+          key={calendarView}
           plugins={[dayGridPlugin, listPlugin]}
-          initialView="dayGridMonth"
+          initialView={calendarView}
           headerToolbar={{
             left: 'prev,next today',
             center: 'title',
@@ -55,6 +67,14 @@ export function EventCalendarView({ events, currentSearch }: { events: PublicEve
       </div>
     </section>
   )
+}
+
+function getPreferredCalendarView(): 'dayGridMonth' | 'listMonth' {
+  if (typeof window === 'undefined') {
+    return 'dayGridMonth'
+  }
+
+  return window.matchMedia('(max-width: 38rem)').matches ? 'listMonth' : 'dayGridMonth'
 }
 
 function CalendarEventContent({ arg }: { arg: EventContentArg }) {
