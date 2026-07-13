@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
+import { SITE_REFERENCE_TIMEZONE } from '../../src/lib/timezones'
 
-export const CANONICAL_TIMEZONE = 'America/Los_Angeles' as const
+export const CANONICAL_TIMEZONE = SITE_REFERENCE_TIMEZONE
 const DEFAULT_LOOKAHEAD_DAYS = 370
 const MAX_RANGE_DAYS = 370
 type AnyDateTime = DateTime<boolean>
@@ -8,32 +9,32 @@ type AnyDateTime = DateTime<boolean>
 export type EventRange = {
   start: AnyDateTime
   end: AnyDateTime
-  timezone: typeof CANONICAL_TIMEZONE
+  timezone: string
 }
 
 export type SerializedEventRange = {
   start: string
   end: string
-  timezone: typeof CANONICAL_TIMEZONE
+  timezone: string
 }
 
 export type RangeValidationResult =
   | { ok: true; range: SerializedEventRange }
   | { ok: false; code: string; message: string; status: number }
 
-export function getTodayRange(now: AnyDateTime = DateTime.now()): EventRange {
-  const localNow = now.setZone(CANONICAL_TIMEZONE)
+export function getTodayRange(now: AnyDateTime = DateTime.now(), timezone = CANONICAL_TIMEZONE): EventRange {
+  const localNow = now.setZone(timezone)
   const start = localNow.startOf('day')
 
   return {
     start,
     end: start.plus({ days: 1 }),
-    timezone: CANONICAL_TIMEZONE,
+    timezone,
   }
 }
 
-export function getThisWeekendRange(now: AnyDateTime = DateTime.now()): EventRange {
-  const localNow = now.setZone(CANONICAL_TIMEZONE)
+export function getThisWeekendRange(now: AnyDateTime = DateTime.now(), timezone = CANONICAL_TIMEZONE): EventRange {
+  const localNow = now.setZone(timezone)
   const monday = localNow.startOf('week')
   let start = monday.plus({ days: 4 }).set({ hour: 16, minute: 0, second: 0, millisecond: 0 })
   let end = start.plus({ days: 3 }).startOf('day')
@@ -46,12 +47,12 @@ export function getThisWeekendRange(now: AnyDateTime = DateTime.now()): EventRan
   return {
     start,
     end,
-    timezone: CANONICAL_TIMEZONE,
+    timezone,
   }
 }
 
-export function getUpcomingRange(now: AnyDateTime = DateTime.now()): EventRange {
-  const localNow = now.setZone(CANONICAL_TIMEZONE)
+export function getUpcomingRange(now: AnyDateTime = DateTime.now(), timezone = CANONICAL_TIMEZONE): EventRange {
+  const localNow = now.setZone(timezone)
   const start = localNow
   const monthEnd = localNow.plus({ months: 1 }).startOf('month')
   const end = monthEnd.diff(start, 'days').days < 7 ? start.plus({ days: 7 }) : monthEnd
@@ -59,29 +60,30 @@ export function getUpcomingRange(now: AnyDateTime = DateTime.now()): EventRange 
   return {
     start,
     end,
-    timezone: CANONICAL_TIMEZONE,
+    timezone,
   }
 }
 
-export function getDefaultEventRange(now: AnyDateTime = DateTime.now()): SerializedEventRange {
-  const today = getTodayRange(now)
+export function getDefaultEventRange(now: AnyDateTime = DateTime.now(), timezone = CANONICAL_TIMEZONE): SerializedEventRange {
+  const today = getTodayRange(now, timezone)
 
   return serializeRange({
     start: today.start,
     end: today.start.plus({ days: DEFAULT_LOOKAHEAD_DAYS }),
-    timezone: CANONICAL_TIMEZONE,
+    timezone,
   })
 }
 
 export function validateRequestedRange(
   searchParams: URLSearchParams,
   now: AnyDateTime = DateTime.now(),
+  timezone = CANONICAL_TIMEZONE,
 ): RangeValidationResult {
   const startParam = searchParams.get('start')
   const endParam = searchParams.get('end')
 
   if (!startParam && !endParam) {
-    return { ok: true, range: getDefaultEventRange(now) }
+    return { ok: true, range: getDefaultEventRange(now, timezone) }
   }
 
   if (!startParam || !endParam) {
@@ -93,8 +95,8 @@ export function validateRequestedRange(
     }
   }
 
-  const start = DateTime.fromISO(startParam, { setZone: true }).setZone(CANONICAL_TIMEZONE)
-  const end = DateTime.fromISO(endParam, { setZone: true }).setZone(CANONICAL_TIMEZONE)
+  const start = DateTime.fromISO(startParam, { setZone: true }).setZone(timezone)
+  const end = DateTime.fromISO(endParam, { setZone: true }).setZone(timezone)
 
   if (!start.isValid || !end.isValid) {
     return {
@@ -125,18 +127,18 @@ export function validateRequestedRange(
 
   return {
     ok: true,
-    range: serializeRange({ start, end, timezone: CANONICAL_TIMEZONE }),
+    range: serializeRange({ start, end, timezone }),
   }
 }
 
 export function serializeRange(range: EventRange): SerializedEventRange {
   return {
-    start: toIsoWithOffset(range.start),
-    end: toIsoWithOffset(range.end),
-    timezone: CANONICAL_TIMEZONE,
+    start: toIsoWithOffset(range.start, range.timezone),
+    end: toIsoWithOffset(range.end, range.timezone),
+    timezone: range.timezone,
   }
 }
 
-export function toIsoWithOffset(value: AnyDateTime): string {
-  return value.setZone(CANONICAL_TIMEZONE).toISO({ suppressMilliseconds: true }) ?? value.toISO() ?? ''
+export function toIsoWithOffset(value: AnyDateTime, timezone = CANONICAL_TIMEZONE): string {
+  return value.setZone(timezone).toISO({ suppressMilliseconds: true }) ?? value.toISO() ?? ''
 }

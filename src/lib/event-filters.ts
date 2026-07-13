@@ -6,7 +6,17 @@ import {
   type AgendaSectionId,
 } from './agenda-sections'
 import type { DateTime } from 'luxon'
-import type { EventAudience, EventCategory, EventPriceType, PublicEvent } from '../types/events'
+import {
+  EVENT_AUDIENCES,
+  EVENT_CATEGORIES,
+  EVENT_PRICE_TYPES,
+  TRAMPSWORLD_STATES,
+  TRAMPSWORLD_VERTICALS,
+  formatFilterLabel,
+} from './event-taxonomy'
+import type { EventAudience, EventCategory, EventPriceType, PublicEvent, TrampsWorldState, TrampsWorldVertical } from '../types/events'
+
+export { formatFilterLabel } from './event-taxonomy'
 
 export type DateViewFilter = 'all' | AgendaSectionId
 export type DisplayMode = 'agenda' | 'calendar'
@@ -15,6 +25,8 @@ export type FilterState = {
   query: string
   display: DisplayMode
   view: DateViewFilter
+  state: TrampsWorldState | ''
+  vertical: TrampsWorldVertical | ''
   category: EventCategory | ''
   city: string
   neighborhood: string
@@ -23,6 +35,8 @@ export type FilterState = {
 }
 
 export type FilterOptions = {
+  states: TrampsWorldState[]
+  verticals: TrampsWorldVertical[]
   categories: EventCategory[]
   cities: string[]
   neighborhoods: string[]
@@ -34,6 +48,8 @@ export const DEFAULT_FILTERS: FilterState = {
   query: '',
   display: 'agenda',
   view: 'all',
+  state: '',
+  vertical: '',
   category: '',
   city: '',
   neighborhood: '',
@@ -48,52 +64,13 @@ export const DATE_VIEW_OPTIONS: Array<{ value: DateViewFilter; label: string }> 
   { value: 'upcoming', label: 'Upcoming' },
 ]
 
-const EVENT_CATEGORIES: EventCategory[] = [
-  'art',
-  'music',
-  'food-drink',
-  'markets',
-  'festivals',
-  'family',
-  'community',
-  'classes-workshops',
-  'nightlife',
-  'outdoors',
-  'sports',
-  'wellness',
-  'spiritual',
-  'theater-film',
-  'other',
-]
-
-const EVENT_AUDIENCES: EventAudience[] = [
-  'all-ages',
-  'family-friendly',
-  'adults',
-  '18-plus',
-  '21-plus',
-  'youth',
-  'unknown',
-]
-
-const EVENT_PRICE_TYPES: EventPriceType[] = ['free', 'paid', 'donation', 'registration-required', 'unknown']
-
-const LABEL_OVERRIDES: Record<string, string> = {
-  '18-plus': '18+',
-  '21-plus': '21+',
-  'all-ages': 'All ages',
-  'classes-workshops': 'Classes & Workshops',
-  'family-friendly': 'Family-friendly',
-  'food-drink': 'Food & Drink',
-  'registration-required': 'Registration required',
-  'theater-film': 'Theater & Film',
-}
-
 export function parseFilters(params: URLSearchParams): FilterState {
   return {
     query: cleanQuery(params.get('q')),
     display: readDisplayMode(params.get('display')),
     view: readDateView(params.get('view')),
+    state: readKnownValue(params.get('state'), TRAMPSWORLD_STATES),
+    vertical: readKnownValue(params.get('vertical'), TRAMPSWORLD_VERTICALS),
     category: readKnownValue(params.get('category'), EVENT_CATEGORIES),
     city: cleanFacet(params.get('city')),
     neighborhood: cleanFacet(params.get('neighborhood')),
@@ -109,6 +86,8 @@ export function serializeFilters(filters: FilterState): URLSearchParams {
   if (query) params.set('q', query)
   if (filters.display !== DEFAULT_FILTERS.display) params.set('display', filters.display)
   if (filters.view !== DEFAULT_FILTERS.view) params.set('view', filters.view)
+  if (filters.state) params.set('state', filters.state)
+  if (filters.vertical) params.set('vertical', filters.vertical)
   if (filters.category) params.set('category', filters.category)
   if (filters.city) params.set('city', filters.city)
   if (filters.neighborhood) params.set('neighborhood', filters.neighborhood)
@@ -122,6 +101,8 @@ export function getActiveFilterCount(filters: FilterState): number {
   return [
     filters.display === 'agenda' ? cleanQuery(filters.query) : '',
     filters.display === 'agenda' && filters.view !== DEFAULT_FILTERS.view ? filters.view : '',
+    filters.state,
+    filters.vertical,
     filters.category,
     filters.city,
     filters.neighborhood,
@@ -167,23 +148,14 @@ export function getFilteredAgendaSections(
 
 export function buildFilterOptions(events: PublicEvent[]): FilterOptions {
   return {
+    states: TRAMPSWORLD_STATES,
+    verticals: TRAMPSWORLD_VERTICALS,
     categories: sortByLabel(unique(events.map((event) => event.taxonomy.primaryCategory))),
     cities: sortText(unique(events.map((event) => event.venue?.city))),
     neighborhoods: sortText(unique(events.map((event) => event.venue?.neighborhood))),
     audiences: sortByLabel(unique(events.flatMap((event) => event.taxonomy.audience))),
     prices: sortByLabel(unique(events.map((event) => event.taxonomy.priceType))),
   }
-}
-
-export function formatFilterLabel(value: string): string {
-  if (LABEL_OVERRIDES[value]) {
-    return LABEL_OVERRIDES[value]
-  }
-
-  return value
-    .split('-')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')
 }
 
 function eventMatchesFilters(event: PublicEvent, filters: FilterState): boolean {
@@ -197,6 +169,14 @@ function eventMatchesFilters(event: PublicEvent, filters: FilterState): boolean 
 }
 
 function eventMatchesFacetFilters(event: PublicEvent, filters: FilterState): boolean {
+  if (filters.state && event.venue?.state !== filters.state) {
+    return false
+  }
+
+  if (filters.vertical && event.taxonomy.vertical !== filters.vertical) {
+    return false
+  }
+
   if (filters.category && event.taxonomy.primaryCategory !== filters.category) {
     return false
   }
@@ -230,7 +210,9 @@ function matchesQuery(event: PublicEvent, query: string): boolean {
       event.venue?.name,
       event.venue?.address,
       event.venue?.city,
+      event.venue?.state,
       event.venue?.neighborhood,
+      event.taxonomy.vertical,
       event.taxonomy.primaryCategory,
       ...event.taxonomy.tags,
       event.organizer?.name,

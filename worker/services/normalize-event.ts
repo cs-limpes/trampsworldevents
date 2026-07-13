@@ -1,49 +1,29 @@
 import { DateTime } from 'luxon'
-import type { EventAudience, EventCategory, EventPriceType, EventStatus, PublicEvent } from '../../src/types/events'
+import {
+  EVENT_AUDIENCES,
+  EVENT_CATEGORIES,
+  EVENT_PRICE_TYPES,
+  TRAMPSWORLD_STATES,
+  TRAMPSWORLD_VERTICALS,
+} from '../../src/lib/event-taxonomy'
+import type {
+  EventAudience,
+  EventCategory,
+  EventPriceType,
+  EventStatus,
+  PublicEvent,
+  TrampsWorldState,
+  TrampsWorldVertical,
+} from '../../src/types/events'
 import { CANONICAL_TIMEZONE, type SerializedEventRange } from '../lib/date-ranges'
 import { parseBoolean, parseEventDescription, parseList, safeHttpsUrl } from '../lib/metadata'
-import type { GoogleCalendarEvent } from '../types/google-calendar'
+import type { GoogleCalendarDateValue, GoogleCalendarEvent } from '../types/google-calendar'
 
-const CATEGORY_VALUES = new Set<EventCategory>([
-  'art',
-  'music',
-  'food-drink',
-  'markets',
-  'festivals',
-  'family',
-  'community',
-  'classes-workshops',
-  'nightlife',
-  'outdoors',
-  'sports',
-  'wellness',
-  'spiritual',
-  'theater-film',
-  'other',
-])
-
-const CITY_VALUES = [
-  'Fresno',
-  'Clovis',
-  'Dinuba',
-  'Shaver Lake',
-  'Oakhurst',
-  'Cutler',
-  'Friant',
-  'Madera',
-  'Sanger',
-  'Selma',
-  'Visalia',
-]
-
-const NEIGHBORHOOD_VALUES = [
-  'Tower District',
-  'Old Town Clovis',
-  'Downtown Fresno',
-  'Harlan Ranch',
-  'Roeding Park',
-  'Woodward Park',
-]
+const CATEGORY_VALUES = new Set<EventCategory>(EVENT_CATEGORIES)
+const AUDIENCE_VALUES = new Set<EventAudience>(EVENT_AUDIENCES)
+const PRICE_VALUES = new Set<EventPriceType>(EVENT_PRICE_TYPES)
+const STATE_VALUES = new Set<TrampsWorldState>(TRAMPSWORLD_STATES)
+const VERTICAL_VALUES = new Set<TrampsWorldVertical>(TRAMPSWORLD_VERTICALS)
 
 const WEEKDAY_VALUES: Record<string, number> = {
   monday: 1,
@@ -84,6 +64,10 @@ export function normalizeGoogleEvent(source: GoogleCalendarEvent): PublicEvent |
   const metadata = parseEventDescription(source.description)
   const allDay = Boolean(source.start?.date)
   const status = normalizeStatus(source.status)
+  const timezone = getGoogleEventTimezone(source)
+  const state = normalizeState(metadata.fields.state, source.location)
+  const vertical = normalizeVertical(metadata.fields.vertical)
+  const category = normalizeCategory(metadata.fields.category)
 
   return {
     id: buildPublicEventId(eventId, source),
@@ -99,30 +83,34 @@ export function normalizeGoogleEvent(source: GoogleCalendarEvent): PublicEvent |
     excerpt: makeExcerpt(metadata.publicDescription),
     start: startValue,
     end: endValue,
-    timezone: CANONICAL_TIMEZONE,
+    timezone,
     allDay,
-    multiDay: isMultiDay(startValue, endValue, allDay),
+    multiDay: isMultiDay(startValue, endValue, allDay, timezone),
     status,
-    venue: buildVenue(source, metadata.fields),
+    venue: buildVenue(source, metadata.fields, state),
     taxonomy: {
-      primaryCategory: normalizeCategory(metadata.fields.category),
+      vertical,
+      primaryCategory: category,
       tags: parseList(metadata.fields.tags),
       audience: normalizeAudience(metadata.fields.audience, metadata.publicDescription, metadata.fields.category),
       priceType: normalizePrice(metadata.fields.price, metadata.fields.price_text),
     },
     pricing: buildPricing(metadata.fields),
     organizer: buildOrganizer(metadata.fields),
-    media: buildMedia(metadata.fields),
+    media: buildMedia(metadata.fields, vertical, category),
     links: {
       sourceUrl: safeHttpsUrl(metadata.fields.source),
       registrationUrl: safeHttpsUrl(metadata.fields.registration),
       websiteUrl: safeHttpsUrl(metadata.fields.website),
+      videoUrl: safeHttpsUrl(metadata.fields.video),
+      galleryUrl: safeHttpsUrl(metadata.fields.gallery),
     },
     editorial: {
       featured: parseBoolean(metadata.fields.featured) ?? false,
       promoted: parseBoolean(metadata.fields.promoted) ?? false,
       sponsored: parseBoolean(metadata.fields.sponsored) ?? false,
       sponsorName: metadata.fields.sponsor_name || undefined,
+      coverageStatus: normalizeCoverageStatus(metadata.fields.coverage_status),
     },
     accessibility: metadata.fields.accessibility ? { text: metadata.fields.accessibility } : undefined,
     updatedAt: source.updated,
@@ -144,12 +132,9 @@ export function normalizeGoogleEventOccurrences(source: GoogleCalendarEvent, ran
     return [event]
   }
 
-  const seriesStart = DateTime.fromISO(source.start?.dateTime ?? source.start?.date ?? '', { setZone: true }).setZone(
-    CANONICAL_TIMEZONE,
-  )
-  const seriesEnd = DateTime.fromISO(source.end?.dateTime ?? source.end?.date ?? '', { setZone: true }).setZone(
-    CANONICAL_TIMEZONE,
-  )
+  const timezone = getGoogleEventTimezone(source)
+  const seriesStart = parseGoogleDateValue(source.start, timezone)
+  const seriesEnd = parseGoogleDateValue(source.end, timezone)
 
   if (!seriesStart.isValid || !seriesEnd.isValid || seriesEnd <= seriesStart) {
     return [event]
@@ -183,8 +168,12 @@ function normalizeStatus(status?: string): EventStatus {
   return 'confirmed'
 }
 
+function getGoogleEventTimezone(source: GoogleCalendarEvent): string | undefined {
+  return source.start?.timeZone || source.end?.timeZone || source.originalStartTime?.timeZone
+}
+
 function normalizeCategory(value?: string): EventCategory {
-  const normalized = value?.trim().toLowerCase().replace(/&/g, '').replace(/\s+/g, '-')
+  const normalized = value?.trim().toLowerCase().replace(/&/g, '').replace(/[_/]+/g, '-').replace(/\s+/g, '-')
 
   if (normalized && CATEGORY_VALUES.has(normalized as EventCategory)) {
     return normalized as EventCategory
@@ -192,33 +181,98 @@ function normalizeCategory(value?: string): EventCategory {
 
   const searchable = value?.toLowerCase() ?? ''
 
-  if (searchable.includes('farmer') || searchable.includes('market')) return 'markets'
-  if (searchable.includes('music') || searchable.includes('performance')) return 'music'
-  if (searchable.includes('movie') || searchable.includes('film') || searchable.includes('theater')) return 'theater-film'
-  if (searchable.includes('food') || searchable.includes('drink')) return 'food-drink'
-  if (searchable.includes('festival') || searchable.includes('firework') || searchable.includes('fiesta')) return 'festivals'
-  if (searchable.includes('craft') || searchable.includes('art')) return 'art'
-  if (searchable.includes('youth') || searchable.includes('teen') || searchable.includes('family')) return 'family'
-  if (searchable.includes('spiritual') || searchable.includes('pagan')) return 'spiritual'
-  if (searchable.includes('wellness') || searchable.includes('medicine')) return 'wellness'
-  if (searchable.includes('community') || searchable.includes('networking')) return 'community'
-  if (searchable.includes('sport') || searchable.includes('competition')) return 'sports'
-  if (searchable.includes('outdoor') || searchable.includes('astronomy') || searchable.includes('lake')) return 'outdoors'
+  if (/\b(car|cars|auto|automotive|hot\s*rod|classic|custom)\b/.test(searchable)) return 'car-show'
+  if (/\b(motorcycle|bike|biker|chopper|cycle)\b/.test(searchable)) return 'motorcycle-event'
+  if (/\b(boat|boating|water|river|lake|pwc|personal watercraft|jet ski|wake)\b/.test(searchable)) {
+    return 'boat-water-event'
+  }
+  if (/\b(off[-\s]?road|dirt|utv|atv|desert|motocross|mx|sand|trail)\b/.test(searchable)) return 'off-road-event'
+  if (/\b(race|racing|drag|drift|speedway|track)\b/.test(searchable)) return 'race'
+  if (/\b(rally|ride|run)\b/.test(searchable)) return 'rally-ride'
+  if (/\b(meet|cruise|cruise-in|night)\b/.test(searchable)) return 'meet-cruise'
+  if (/\b(festival|fiesta|fair)\b/.test(searchable)) return 'festival'
+  if (/\b(expo|trade show|showcase|convention)\b/.test(searchable)) return 'expo-trade-show'
+  if (/\b(swap|market|vendor)\b/.test(searchable)) return 'swap-meet-market'
+  if (/\b(community|fundraiser|benefit|charity)\b/.test(searchable)) return 'community'
 
   return 'other'
+}
+
+function normalizeState(value?: string, location?: string): TrampsWorldState {
+  const explicit = normalizeStateValue(value)
+
+  if (explicit !== 'unknown') {
+    return explicit
+  }
+
+  return normalizeStateValue(readLocationState(location))
+}
+
+function normalizeStateValue(value?: string): TrampsWorldState {
+  const normalized = value?.trim().toLowerCase().replace(/\./g, '').replace(/[_-]+/g, ' ').replace(/\s+/g, ' ')
+
+  if (!normalized) {
+    return 'unknown'
+  }
+
+  const aliases: Record<string, TrampsWorldState> = {
+    arizona: 'AZ',
+    az: 'AZ',
+    california: 'CA',
+    ca: 'CA',
+    nevada: 'NV',
+    nv: 'NV',
+    'new mexico': 'NM',
+    nm: 'NM',
+    unknown: 'unknown',
+  }
+
+  const state = aliases[normalized] ?? 'unknown'
+  return STATE_VALUES.has(state) ? state : 'unknown'
+}
+
+function normalizeVertical(value?: string): TrampsWorldVertical {
+  const normalized = value?.trim().toLowerCase().replace(/[^a-z0-9]+/g, '')
+
+  if (!normalized) {
+    return 'unclassified'
+  }
+
+  const aliases: Record<string, TrampsWorldVertical> = {
+    hotrodtramp: 'hotrodtramp',
+    hotrod: 'hotrodtramp',
+    hotrods: 'hotrodtramp',
+    cycletramp: 'cycletramp',
+    cycle: 'cycletramp',
+    motorcycle: 'cycletramp',
+    motorcycles: 'cycletramp',
+    rivertramp: 'rivertramp',
+    river: 'rivertramp',
+    boating: 'rivertramp',
+    dirttramp: 'dirttramp',
+    dirt: 'dirttramp',
+    offroad: 'dirttramp',
+    unclassified: 'unclassified',
+    unknown: 'unclassified',
+  }
+
+  const vertical = aliases[normalized] ?? 'unclassified'
+  return VERTICAL_VALUES.has(vertical) ? vertical : 'unclassified'
 }
 
 function normalizeAudience(value?: string, description?: string, category?: string): EventAudience[] {
   const values = parseList(value).map((item) => {
     const normalized = item.toLowerCase().trim()
+    let candidate: EventAudience = 'unknown'
 
-    if (normalized === 'all ages' || normalized === 'all-ages') return 'all-ages'
-    if (normalized === 'family' || normalized === 'family-friendly') return 'family-friendly'
-    if (normalized === 'adult' || normalized === 'adults') return 'adults'
-    if (normalized === '18+' || normalized === '18-plus') return '18-plus'
-    if (normalized === '21+' || normalized === '21-plus') return '21-plus'
-    if (normalized === 'youth') return 'youth'
-    return 'unknown'
+    if (normalized === 'all ages' || normalized === 'all-ages') candidate = 'all-ages'
+    if (normalized === 'family' || normalized === 'family-friendly') candidate = 'family-friendly'
+    if (normalized === 'adult' || normalized === 'adults') candidate = 'adults'
+    if (normalized === '18+' || normalized === '18-plus') candidate = '18-plus'
+    if (normalized === '21+' || normalized === '21-plus') candidate = '21-plus'
+    if (normalized === 'youth') candidate = 'youth'
+
+    return AUDIENCE_VALUES.has(candidate) ? candidate : 'unknown'
   })
 
   const unique = Array.from(new Set(values))
@@ -257,7 +311,7 @@ function normalizePrice(value?: string, displayText?: string): EventPriceType {
     normalized === 'donation' ||
     normalized === 'registration-required'
   ) {
-    return normalized
+    return PRICE_VALUES.has(normalized) ? normalized : 'unknown'
   }
 
   const searchable = displayText?.toLowerCase() ?? ''
@@ -281,21 +335,63 @@ function normalizePrice(value?: string, displayText?: string): EventPriceType {
   return 'unknown'
 }
 
-function buildVenue(source: GoogleCalendarEvent, fields: Record<string, string>): PublicEvent['venue'] {
+function normalizeCoverageStatus(value?: string): PublicEvent['editorial']['coverageStatus'] {
+  const normalized = value?.trim().toLowerCase().replace(/[_\s]+/g, '-')
+
+  if (normalized === 'none' || normalized === 'planned' || normalized === 'published') {
+    return normalized
+  }
+
+  return undefined
+}
+
+function readLocationState(location?: string): string | undefined {
+  if (!location) {
+    return undefined
+  }
+
+  return location
+    .split(',')
+    .map((part) => part.trim())
+    .find((part) => normalizeStateValue(part) !== 'unknown')
+}
+
+function readLocationCity(location?: string): string | undefined {
+  if (!location) {
+    return undefined
+  }
+
+  const parts = location
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean)
+  const stateIndex = parts.findIndex((part) => normalizeStateValue(part) !== 'unknown')
+
+  if (stateIndex <= 0) {
+    return undefined
+  }
+
+  return parts[stateIndex - 1]
+}
+
+function buildVenue(
+  source: GoogleCalendarEvent,
+  fields: Record<string, string>,
+  state: TrampsWorldState,
+): PublicEvent['venue'] {
   const online = parseBoolean(fields.online) ?? false
   const name = fields.venue || undefined
   const address = fields.address || source.location || undefined
-  const city = fields.city || inferKnownPlace(source.location, CITY_VALUES) || undefined
-  const neighborhood = fields.neighborhood || inferKnownPlace(source.location, NEIGHBORHOOD_VALUES) || undefined
-
-  if (!name && !address && !city && !neighborhood && !online) {
-    return undefined
-  }
+  const city = fields.city || readLocationCity(source.location) || undefined
+  const region = fields.region || undefined
+  const neighborhood = fields.neighborhood || undefined
 
   return {
     name,
     address,
     city,
+    state,
+    region,
     neighborhood,
     online,
   }
@@ -330,7 +426,11 @@ function buildOrganizer(fields: Record<string, string>): PublicEvent['organizer'
   }
 }
 
-function buildMedia(fields: Record<string, string>): PublicEvent['media'] {
+function buildMedia(
+  fields: Record<string, string>,
+  vertical: TrampsWorldVertical,
+  category: EventCategory,
+): PublicEvent['media'] {
   const imageUrl = safeHttpsUrl(fields.image)
   const flyerUrl = safeHttpsUrl(fields.flyer)
 
@@ -338,18 +438,8 @@ function buildMedia(fields: Record<string, string>): PublicEvent['media'] {
     imageUrl,
     imageAlt: fields.image_alt || undefined,
     flyerUrl,
-    categoryArtKey: normalizeCategory(fields.category),
+    visualKey: vertical === 'unclassified' ? category : vertical,
   }
-}
-
-function inferKnownPlace(value: string | undefined, knownValues: string[]): string | undefined {
-  const normalized = value?.toLowerCase()
-
-  if (!normalized) {
-    return undefined
-  }
-
-  return knownValues.find((knownValue) => normalized.includes(knownValue.toLowerCase()))
 }
 
 type WeeklyRecurrence = {
@@ -474,11 +564,11 @@ function expandWeeklyEvent(
 }
 
 function toIso(value: DateTime<boolean>): string {
-  return value.setZone(CANONICAL_TIMEZONE).toISO({ suppressMilliseconds: true }) ?? value.toISO() ?? ''
+  return value.toISO({ suppressMilliseconds: true }) ?? value.toISO() ?? ''
 }
 
 function parseRangeBoundary(value: string): DateTime<boolean> | undefined {
-  const parsed = DateTime.fromISO(value, { setZone: true }).setZone(CANONICAL_TIMEZONE)
+  const parsed = DateTime.fromISO(value, { setZone: true })
   return parsed.isValid ? parsed : undefined
 }
 
@@ -491,15 +581,15 @@ function makeExcerpt(description?: string): string | undefined {
   return singleLine.length > 180 ? `${singleLine.slice(0, 177)}...` : singleLine
 }
 
-function isMultiDay(start: string, end: string, allDay: boolean): boolean {
+function isMultiDay(start: string, end: string, allDay: boolean, timezone?: string): boolean {
   if (allDay) {
     const startDate = DateTime.fromISO(start, { zone: CANONICAL_TIMEZONE })
     const endDate = DateTime.fromISO(end, { zone: CANONICAL_TIMEZONE })
     return endDate.diff(startDate, 'days').days > 1
   }
 
-  const startDateTime = DateTime.fromISO(start, { setZone: true }).setZone(CANONICAL_TIMEZONE)
-  const endDateTime = DateTime.fromISO(end, { setZone: true }).setZone(CANONICAL_TIMEZONE)
+  const startDateTime = parseDateTimeWithZone(start, timezone)
+  const endDateTime = parseDateTimeWithZone(end, timezone)
 
   return startDateTime.toISODate() !== endDateTime.toISODate()
 }
@@ -507,7 +597,17 @@ function isMultiDay(start: string, end: string, allDay: boolean): boolean {
 function eventStartMillis(event: PublicEvent): number {
   const start = event.allDay
     ? DateTime.fromISO(event.start, { zone: CANONICAL_TIMEZONE })
-    : DateTime.fromISO(event.start, { setZone: true }).setZone(CANONICAL_TIMEZONE)
+    : parseDateTimeWithZone(event.start, event.timezone)
 
   return start.toMillis()
+}
+
+function parseGoogleDateValue(value: GoogleCalendarDateValue | undefined, timezone?: string): DateTime<boolean> {
+  const dateValue = value?.dateTime ?? value?.date ?? ''
+  return parseDateTimeWithZone(dateValue, value?.timeZone ?? timezone)
+}
+
+function parseDateTimeWithZone(value: string, timezone?: string): DateTime<boolean> {
+  const parsed = DateTime.fromISO(value, timezone ? { zone: timezone } : { setZone: true })
+  return parsed.isValid ? parsed : DateTime.invalid('Invalid event date')
 }

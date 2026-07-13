@@ -66,6 +66,7 @@ function event(overrides: Partial<PublicEvent>): PublicEvent {
     multiDay: false,
     status: 'confirmed',
     taxonomy: {
+      vertical: 'unclassified',
       primaryCategory: 'other',
       tags: [],
       audience: ['unknown'],

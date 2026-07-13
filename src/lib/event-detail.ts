@@ -1,4 +1,5 @@
 import type { PublicEvent } from '../types/events'
+import { formatKnownState } from './event-taxonomy'
 
 const DETAIL_SEPARATOR = '--'
 
@@ -32,7 +33,7 @@ export function getEventCanonicalUrl(event: PublicEvent, origin: string): string
 }
 
 export function getEventSummary(event: PublicEvent): string {
-  return event.excerpt || event.description || `${event.title} on Fresno Events.`
+  return event.excerpt || event.description || `${event.title} on TrampsWorld Events.`
 }
 
 export function buildGoogleCalendarUrl(event: PublicEvent, eventUrl?: string): string {
@@ -60,11 +61,11 @@ export function buildIcsContent(event: PublicEvent, eventUrl: string, generatedA
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Fresno Events//EN',
+    'PRODID:-//TrampsWorld Events//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
-    `UID:${escapeIcsText(`${event.id}@fresnoevents`)}`,
+    `UID:${escapeIcsText(`${event.id}@trampsworldevents`)}`,
     `DTSTAMP:${formatIcsDateTime(generatedAt.toISOString())}`,
     ...buildIcsDateLines(event),
     `SUMMARY:${escapeIcsText(event.title)}`,
@@ -87,7 +88,9 @@ export function buildMapUrl(event: PublicEvent): string | undefined {
     return event.venue.mapUrl
   }
 
-  const query = event.venue?.address || [event.venue?.name, event.venue?.city].filter(Boolean).join(', ')
+  const query =
+    event.venue?.address ||
+    [event.venue?.name, event.venue?.city, formatKnownState(event.venue?.state)].filter(Boolean).join(', ')
 
   if (!query) {
     return undefined
@@ -100,16 +103,18 @@ export function buildMapUrl(event: PublicEvent): string | undefined {
 }
 
 export function buildStructuredEventData(event: PublicEvent, eventUrl: string): Record<string, unknown> {
+  const knownState = formatKnownState(event.venue?.state)
+  const hasPhysicalLocation = Boolean(event.venue && (event.venue.name || event.venue.address || event.venue.city || knownState))
   const location = event.venue?.online
     ? {
         '@type': 'VirtualLocation',
         url: event.links.websiteUrl || event.links.registrationUrl || event.links.sourceUrl || eventUrl,
       }
-    : event.venue
+    : hasPhysicalLocation && event.venue
       ? {
           '@type': 'Place',
-          name: event.venue.name || event.venue.address || event.venue.city,
-          address: event.venue.address || event.venue.city,
+          name: event.venue.name || event.venue.address || event.venue.city || knownState,
+          address: [event.venue.address || event.venue.city, knownState].filter(Boolean).join(', '),
         }
       : undefined
 
@@ -126,6 +131,7 @@ export function buildStructuredEventData(event: PublicEvent, eventUrl: string): 
       ? 'https://schema.org/OnlineEventAttendanceMode'
       : 'https://schema.org/OfflineEventAttendanceMode',
     image: event.media?.imageUrl,
+    keywords: [event.taxonomy.vertical, event.taxonomy.primaryCategory, event.venue?.state].filter(Boolean).join(', '),
     location,
     organizer: event.organizer?.name
       ? removeUndefinedValues({
@@ -145,6 +151,7 @@ export function formatEventLocation(event: PublicEvent): string | undefined {
     event.venue?.address,
     event.venue?.neighborhood,
     event.venue?.city,
+    formatKnownState(event.venue?.state),
     event.venue?.online ? 'Online' : undefined,
   ].filter(Boolean)
 

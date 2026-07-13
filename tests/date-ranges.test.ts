@@ -10,12 +10,20 @@ import {
 } from '../worker/lib/date-ranges'
 
 describe('date ranges', () => {
-  it('calculates today in America/Los_Angeles', () => {
+  it('calculates today in America/Phoenix', () => {
     const now = DateTime.fromISO('2026-07-11T10:30:00', { zone: CANONICAL_TIMEZONE })
     const range = getTodayRange(now)
 
     expect(range.start.toISO()).toBe('2026-07-11T00:00:00.000-07:00')
     expect(range.end.toISO()).toBe('2026-07-12T00:00:00.000-07:00')
+  })
+
+  it('keeps Arizona on MST during winter site windows', () => {
+    const now = DateTime.fromISO('2026-12-11T10:30:00', { zone: CANONICAL_TIMEZONE })
+    const range = getThisWeekendRange(now)
+
+    expect(range.start.toISO()).toBe('2026-12-11T16:00:00.000-07:00')
+    expect(range.end.toISO()).toBe('2026-12-14T00:00:00.000-07:00')
   })
 
   it('uses the current weekend window when already inside it', () => {

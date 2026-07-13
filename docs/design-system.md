@@ -2,35 +2,15 @@
 
 ## Design objective
 
-TrampsWorld Events should feel like a focused, polished road-culture event guide with strong calendar functionality.
+TrampsWorld Events should feel like a polished road-culture and motorsports-media guide with strong calendar functionality.
 
-It should not resemble:
-
-- a raw Google Calendar embed
-- a generic SaaS dashboard
-- a municipal calendar
-- a chaotic wall of flyers
-- a replacement for the full TrampsWorld websites
+It should not resemble a raw Google Calendar embed, generic SaaS dashboard, municipal calendar, or chaotic wall of flyers.
 
 The design should balance speed, grit, energy, readability, trust, and TrampsWorld personality.
 
-## Product context
-
-The application is a standalone event destination linked from TrampsWorld.com and the vertical WordPress sites.
-
-It should feel recognizably related to the TrampsWorld family without trying to reproduce every site's full header, navigation, content library, or visual variation.
-
-A visitor arriving from a vertical site may see that vertical preselected. The interface must still clearly identify the destination as TrampsWorld Events and allow the filter to be cleared.
-
 ## Brand foundation
 
-The TrampsWorld family includes:
-
-- TrampsWorld
-- HotRodTramp
-- CycleTramp
-- RiverTramp
-- DirtTramp
+The TrampsWorld family includes TrampsWorld, HotRodTramp, CycleTramp, RiverTramp, and DirtTramp.
 
 Current established direction:
 
@@ -41,9 +21,7 @@ Current established direction:
 - complementary expressive lettering for supporting words
 - gauge, machine, route, road, water, and dirt motifs where appropriate
 
-Existing approved TrampsWorld logos and assets take precedence over invented replacements.
-
-Codex must not create or declare a new permanent logo without explicit approval.
+Existing TrampsWorld logos and approved assets take precedence over invented replacements. Codex must not create or declare a new permanent logo without explicit approval.
 
 ## Core principles
 
@@ -53,69 +31,31 @@ Codex must not create or declare a new permanent logo without explicit approval.
 - Controlled variety across verticals
 - Calm structure around noisy event flyers
 - Accessibility built into components
-- Event discovery over decorative complexity
-- Clear preselected-filter state for visitors arriving from a vertical site
+- Editorial clarity over decorative complexity
 
 ## Vertical visual system
 
 Verticals should have distinct motifs while remaining part of one family.
 
 - HotRodTramp: gauge, chrome, grille, tire, pinstripe, road markings
-- CycleTramp: wheel, engine fins, handlebars, road stripe, chain, mechanical geometry
+- CycleTramp: wheel, engine fins, handlebars, road stripe, chain or mechanical geometry
 - RiverTramp: waterline, wake, buoy, propeller, lake horizon
 - DirtTramp: dust, tread, desert line, checkers, trail, terrain contour
 - Unclassified: neutral TrampsWorld mark or general road motif
 
-Differences must not rely on color alone.
-
-Text labels remain visible.
+Differences must not rely on color alone. Text labels remain visible.
 
 ## Page frame
 
-The event application may include:
-
-- concise TrampsWorld Events header
-- Agenda and Calendar navigation
-- search
-- date controls
-- state filters
-- vertical filters
-- category and location filters
-- Today
-- This Weekend
-- Upcoming
-- event detail pages
-- corrections or event-lead access
-- concise footer with outbound TrampsWorld links
+The eventual structure may include header, primary navigation, hero or intro, search and filters, Today, This Weekend, Upcoming, Calendar, vertical browsing, state browsing, featured coverage, newsletter, sponsor placements, and footer.
 
 Only implement regions authorized by the current task.
 
-Do not recreate the full navigation or content structure of all TrampsWorld websites inside the event app.
-
 ## Header
 
-The header may include:
-
-- approved TrampsWorld logo or temporary TrampsWorld Events wordmark
-- Agenda
-- Calendar
-- filter access
-- concise link back to the main TrampsWorld site
-- mobile navigation when required
-
-The header should not become a duplicate of the full WordPress menus.
+The header may include the approved TrampsWorld logo or temporary wordmark, Events, Calendar, vertical navigation, state access, This Weekend, Submit or Contact, and mobile navigation.
 
 Hide controls that are not functional.
-
-## Entry-filter treatment
-
-When a visitor arrives through a prefiltered vertical URL:
-
-- show the selected vertical clearly,
-- include an accessible way to clear it,
-- do not disguise the page as a separate application,
-- preserve the shared TrampsWorld Events identity,
-- and do not rely only on color or artwork to communicate the selection.
 
 ## Event cards
 
@@ -129,29 +69,17 @@ Recommended hierarchy:
 6. city and state
 7. category
 8. price or audience indicator when useful
-9. featured, promoted, or sponsored disclosure when applicable
+9. coverage, featured, promoted, or sponsored disclosure when applicable
 
 Use consistent image ratios and touch-friendly card interactions.
 
 ## Event imagery
 
-Use original imagery when it:
+Use original imagery when it is high quality, crops safely, has appropriate rights, and improves the placement.
 
-- is high quality,
-- crops safely,
-- has appropriate rights,
-- and improves the placement.
+Use controlled vertical or category art when no image exists, a flyer is too text-heavy, resolution is poor, or the result would create visual chaos.
 
-Use controlled vertical or category art when:
-
-- no image exists,
-- a flyer is too text-heavy,
-- resolution is poor,
-- or the result would create visual chaos.
-
-Do not stretch flyers.
-
-Do not use flyer text as the only accessible event information.
+Do not stretch flyers or use flyer text as the only accessible event information.
 
 ## Typography
 
@@ -163,9 +91,7 @@ Prefer a small type system with:
 - clear metadata numerals
 - robust fallbacks
 
-Known TrampsWorld source typography includes Stencil Std Bold, Benguiat Bk BT Bold, and Rock Salt in existing brand work.
-
-Do not assume those font files are licensed or available in the application. Use approved web-safe or properly licensed alternatives when needed.
+Known TrampsWorld source typography includes Stencil Std Bold, Benguiat Bk BT Bold, and Rock Salt in existing brand work. Do not assume those files are licensed or available in the application. Use approved web-safe or properly licensed alternatives when needed.
 
 ## Color tokens
 
@@ -194,14 +120,7 @@ Vertical colors, if added, must remain separate from semantic status colors.
 
 ## Controls, filters, and search
 
-State and vertical controls should:
-
-- show current state clearly,
-- support individual removal,
-- support clear-all behavior,
-- remain keyboard accessible,
-- persist in URL state,
-- and work comfortably on mobile.
+State and vertical controls should show current state clearly, support individual removal and clear-all behavior, remain keyboard accessible, persist in URL state where appropriate, and work comfortably on mobile.
 
 Search must have an explicit label, clear behavior, and no fake production state.
 
@@ -219,40 +138,14 @@ Minimum checks:
 - 1024px
 - 1440px
 
-No horizontal page scrolling at 320px.
-
-Controls and cards must remain readable at 200% zoom.
+No horizontal page scrolling at 320px. Controls and cards must remain readable at 200% zoom.
 
 ## Accessibility
 
-Use:
-
-- visible focus
-- logical tab order
-- comfortable touch targets
-- semantic collections
-- logical heading order
-- appropriate icon labels
-- reduced-motion support
-- screen-reader-friendly dates
-- sufficient contrast
-- no hover-only information
+Use visible focus, logical tab order, comfortable touch targets, semantic collections, logical heading order, appropriate icon labels, reduced-motion support, screen-reader-friendly dates, sufficient contrast, and no hover-only information.
 
 ## Approval boundaries
 
-Codex may:
+Codex may adapt existing components to TrampsWorld tokens, build reusable vertical visuals, improve responsive behavior, and preserve accessibility.
 
-- adapt existing components to TrampsWorld tokens,
-- build reusable vertical visuals,
-- improve responsive behavior,
-- implement clear prefiltered-entry states,
-- and preserve accessibility.
-
-Codex may not:
-
-- invent a final logo,
-- add paid fonts,
-- redefine the four verticals,
-- recreate the broader TrampsWorld websites,
-- create sponsor styling before its task,
-- or redesign product scope without approval.
+Codex may not invent a final logo, add paid fonts, redefine the four verticals, create sponsor styling before its task, or redesign product scope without approval.

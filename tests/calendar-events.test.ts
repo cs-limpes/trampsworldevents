@@ -31,6 +31,23 @@ describe('calendar events', () => {
     expect(calendarEvents[0].classNames).toContain('calendar-event-multi-day')
   })
 
+  it('uses event-local wall time for timed FullCalendar placement', () => {
+    const events = [
+      event({
+        id: 'winter-pacific-night',
+        start: '2026-12-12T23:30:00-08:00',
+        end: '2026-12-13T01:00:00-08:00',
+        timezone: 'America/Los_Angeles',
+      }),
+    ]
+
+    const calendarEvents = toFullCalendarEvents(events)
+
+    expect(calendarEvents[0].start).toBe('2026-12-12T23:30:00')
+    expect(calendarEvents[0].end).toBe('2026-12-13T01:00:00')
+  })
+
+
   it('deduplicates repeated section events by public event id', () => {
     const duplicate = event({ id: 'duplicate' })
     const unique = event({ id: 'unique' })
@@ -54,6 +71,7 @@ function event(overrides: Partial<PublicEvent> = {}): PublicEvent {
     multiDay: false,
     status: 'confirmed',
     taxonomy: {
+      vertical: 'unclassified',
       primaryCategory: 'other',
       tags: [],
       audience: ['unknown'],

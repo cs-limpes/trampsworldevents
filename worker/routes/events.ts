@@ -1,4 +1,5 @@
 import type { ApiErrorResponse, EventsResponse, PublicEvent } from '../../src/types/events'
+import { SITE_REFERENCE_TIMEZONE } from '../../src/lib/timezones'
 import { validateRequestedRange } from '../lib/date-ranges'
 import { fetchGoogleCalendarEvents, GoogleCalendarError } from '../services/google-calendar'
 import { comparePublicEvents, normalizeGoogleEventOccurrences } from '../services/normalize-event'
@@ -32,7 +33,7 @@ export type EventsLoadResult =
 export async function loadEventsResponse(searchParams: URLSearchParams, env: Env): Promise<EventsLoadResult> {
   const calendarId = env.GOOGLE_CALENDAR_ID
   const apiKey = env.GOOGLE_CALENDAR_API_KEY
-  const timezone = env.GOOGLE_CALENDAR_TIMEZONE || 'America/Los_Angeles'
+  const timezone = env.GOOGLE_CALENDAR_TIMEZONE || SITE_REFERENCE_TIMEZONE
 
   if (!calendarId || !apiKey) {
     return {
@@ -43,7 +44,7 @@ export async function loadEventsResponse(searchParams: URLSearchParams, env: Env
     }
   }
 
-  const rangeResult = validateRequestedRange(searchParams)
+  const rangeResult = validateRequestedRange(searchParams, undefined, timezone)
 
   if (!rangeResult.ok) {
     return rangeResult

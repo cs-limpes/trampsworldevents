@@ -10,7 +10,9 @@ describe('normalizeGoogleEvent', () => {
       description: `Public description.
 
 ---
-category: art
+state: CA
+vertical: HotRodTramp
+category: car show
 audience: 21+
 price: paid
 featured: yes
@@ -29,7 +31,9 @@ source: https://example.com/event`,
     expect(event?.id).toContain('20260711T2200000700')
     expect(event?.source).not.toHaveProperty('calendarId')
     expect(event?.description).toBe('Public description.')
-    expect(event?.taxonomy.primaryCategory).toBe('art')
+    expect(event?.venue?.state).toBe('CA')
+    expect(event?.taxonomy.vertical).toBe('hotrodtramp')
+    expect(event?.taxonomy.primaryCategory).toBe('car-show')
     expect(event?.taxonomy.audience).toEqual(['21-plus'])
     expect(event?.taxonomy.priceType).toBe('paid')
     expect(event?.editorial.featured).toBe(true)
@@ -71,19 +75,95 @@ source: https://example.com/event`,
     expect(event?.end).toBe('2026-07-13')
   })
 
+  it('normalizes state, vertical, and media metadata into the public event', () => {
+    const source: GoogleCalendarEvent = {
+      id: 'dirt-1',
+      summary: 'Desert Trail Run',
+      description: `Trail ride details.
+
+---
+state: New Mexico
+vertical: DirtTramp
+category: off road
+video: https://example.com/video
+gallery: https://example.com/gallery
+coverage_status: planned`,
+      start: { dateTime: '2026-10-03T09:00:00-06:00', timeZone: 'America/Denver' },
+      end: { dateTime: '2026-10-03T12:00:00-06:00', timeZone: 'America/Denver' },
+      status: 'confirmed',
+    }
+
+    const event = normalizeGoogleEvent(source)
+
+    expect(event?.timezone).toBe('America/Denver')
+    expect(event?.venue?.state).toBe('NM')
+    expect(event?.taxonomy.vertical).toBe('dirttramp')
+    expect(event?.taxonomy.primaryCategory).toBe('off-road-event')
+    expect(event?.media?.visualKey).toBe('dirttramp')
+    expect(event?.links.videoUrl).toBe('https://example.com/video')
+    expect(event?.links.galleryUrl).toBe('https://example.com/gallery')
+    expect(event?.editorial.coverageStatus).toBe('planned')
+  })
+
+  it('keeps invalid state and vertical values as safe fallbacks', () => {
+    const source: GoogleCalendarEvent = {
+      id: 'unknown-1',
+      summary: 'Unclassified Event',
+      description: `Details.
+
+---
+state: Texas
+vertical: SpaceTramp`,
+      start: { dateTime: '2026-08-01T12:00:00-07:00' },
+      end: { dateTime: '2026-08-01T14:00:00-07:00' },
+      status: 'confirmed',
+    }
+
+    const event = normalizeGoogleEvent(source)
+
+    expect(event?.venue?.state).toBe('unknown')
+    expect(event?.taxonomy.vertical).toBe('unclassified')
+  })
+
+  it('expands recurring Pacific events across daylight saving changes in event-local time', () => {
+    const source: GoogleCalendarEvent = {
+      id: 'spring-ride',
+      summary: 'Sunday Morning Ride',
+      description: `Weekly ride.
+
+Type: recurring_event
+Category: motorcycle ride
+Recurrence note: Sundays weekly, 9:00-10:00 AM`,
+      start: { dateTime: '2026-03-01T09:00:00-08:00', timeZone: 'America/Los_Angeles' },
+      end: { dateTime: '2026-03-22T10:00:00-07:00', timeZone: 'America/Los_Angeles' },
+      status: 'confirmed',
+    }
+
+    const events = normalizeGoogleEventOccurrences(source)
+
+    expect(events.map((event) => event.start)).toEqual([
+      '2026-03-01T09:00:00-08:00',
+      '2026-03-08T09:00:00-07:00',
+      '2026-03-15T09:00:00-07:00',
+      '2026-03-22T09:00:00-07:00',
+    ])
+    expect(events.every((event) => event.timezone === 'America/Los_Angeles')).toBe(true)
+  })
+
   it('expands explicit weekly recurrence-note events into individual occurrences', () => {
     const source: GoogleCalendarEvent = {
       id: 'soul-medicine',
-      summary: 'Soul Medicine Teen Circle',
-      description: `A weekly heart-centered experience for ages 13-18.
+      summary: 'Wednesday Bike Night',
+      description: `A weekly motorcycle meetup for riders 21+.
 
 Type: recurring_event
-Category: Youth Teen Program
-Organizer: The Vibe Tribe
-Cost/tickets: $22 DROP-IN, $44 MONTHLY MEMBERSHIP
-URL/contact: www.TheVibeTribe.tv
+Category: Bike Night
+Audience: 21+
+Organizer: Desert Roadhouse
+Cost/tickets: $10 suggested donation
+URL/contact: www.example.com
 Recurrence note: Wednesdays weekly, 4:30-6:00 PM`,
-      location: 'The Vibe Tribe, Fresno, CA',
+      location: 'Desert Roadhouse, Phoenix, AZ',
       start: { dateTime: '2026-07-01T16:30:00-07:00' },
       end: { dateTime: '2026-07-22T18:00:00-07:00' },
       status: 'confirmed',
@@ -104,16 +184,17 @@ Recurrence note: Wednesdays weekly, 4:30-6:00 PM`,
       '2026-07-22T18:00:00-07:00',
     ])
     expect(events[0]).toMatchObject({
-      title: 'Soul Medicine Teen Circle',
+      title: 'Wednesday Bike Night',
       multiDay: false,
-      venue: { city: 'Fresno' },
+      venue: { city: 'Phoenix', state: 'AZ' },
       taxonomy: {
-        primaryCategory: 'family',
-        audience: ['youth'],
-        priceType: 'paid',
+        vertical: 'unclassified',
+        primaryCategory: 'motorcycle-event',
+        audience: ['21-plus'],
+        priceType: 'donation',
       },
-      organizer: { name: 'The Vibe Tribe' },
-      links: { websiteUrl: 'https://www.thevibetribe.tv/' },
+      organizer: { name: 'Desert Roadhouse' },
+      links: { websiteUrl: 'https://www.example.com/' },
     })
     expect(new Set(events.map((event) => event.id)).size).toBe(events.length)
   })
@@ -121,11 +202,11 @@ Recurrence note: Wednesdays weekly, 4:30-6:00 PM`,
   it('clips expanded recurrence-note occurrences to the requested range', () => {
     const source: GoogleCalendarEvent = {
       id: 'soul-medicine',
-      summary: 'Soul Medicine Teen Circle',
-      description: `A weekly heart-centered experience for ages 13-18.
+      summary: 'Wednesday Bike Night',
+      description: `A weekly motorcycle meetup.
 
 Type: recurring_event
-Category: Youth Teen Program
+Category: Bike Night
 Recurrence note: Wednesdays weekly, 4:30-6:00 PM`,
       start: { dateTime: '2026-07-01T16:30:00-07:00' },
       end: { dateTime: '2026-07-29T18:00:00-07:00' },
@@ -135,7 +216,7 @@ Recurrence note: Wednesdays weekly, 4:30-6:00 PM`,
     const events = normalizeGoogleEventOccurrences(source, {
       start: '2026-07-12T00:00:00-07:00',
       end: '2026-07-26T00:00:00-07:00',
-      timezone: 'America/Los_Angeles',
+      timezone: 'America/Phoenix',
     })
 
     expect(events.map((event) => event.start)).toEqual([

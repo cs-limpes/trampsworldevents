@@ -1,7 +1,7 @@
 import type { ContactDraftRequest, ContactDraftResponse } from '../../src/types/contact'
 
 export type ContactEnv = {
-  FRESNO_EVENTS_CONTACT_EMAIL?: string
+  TRAMPSWORLD_EVENTS_CONTACT_EMAIL?: string
 }
 
 type ContactDraftResult =
@@ -36,7 +36,7 @@ export async function handleContactDraftRequest(request: Request, env: ContactEn
 }
 
 export async function buildContactDraftResponse(request: Request, env: ContactEnv): Promise<ContactDraftResult> {
-  const recipient = normalizeRecipient(env.FRESNO_EVENTS_CONTACT_EMAIL)
+  const recipient = normalizeRecipient(env.TRAMPSWORLD_EVENTS_CONTACT_EMAIL)
 
   if (!recipient) {
     return {
@@ -150,7 +150,7 @@ function readString(input: Record<string, unknown>, key: keyof ContactDraftReque
 function buildMailtoUrl(recipient: string, draft: NormalizedContactDraft): string {
   const subject = buildSubject(draft)
   const body = [
-    'Fresno Events contact request',
+    'TrampsWorld Events contact request',
     '',
     `Type: ${draft.intent === 'correction' ? 'Correction' : 'Event lead'}`,
     draft.eventTitle ? `Event title: ${draft.eventTitle}` : undefined,
@@ -165,7 +165,7 @@ function buildMailtoUrl(recipient: string, draft: NormalizedContactDraft): strin
     draft.senderName ? `Name: ${draft.senderName}` : undefined,
     draft.senderEmail ? `Reply email: ${draft.senderEmail}` : undefined,
     '',
-    'New events are reviewed before appearing on Fresno Events.',
+    'New events are reviewed before appearing on TrampsWorld Events.',
   ]
     .filter((line): line is string => line !== undefined)
     .join('\n')
@@ -175,7 +175,7 @@ function buildMailtoUrl(recipient: string, draft: NormalizedContactDraft): strin
 
 function buildSubject(draft: NormalizedContactDraft): string {
   const prefix = draft.intent === 'correction' ? 'Correction' : 'Event lead'
-  const subject = `${prefix}: ${draft.eventTitle || 'Fresno event'}`
+  const subject = `${prefix}: ${draft.eventTitle || 'TrampsWorld event'}`
 
   return subject.slice(0, 90)
 }

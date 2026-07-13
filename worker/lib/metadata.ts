@@ -1,8 +1,11 @@
 const ALLOWED_KEYS = new Set([
   'type',
+  'state',
+  'vertical',
   'category',
   'tags',
   'city',
+  'region',
   'neighborhood',
   'venue',
   'address',
@@ -25,6 +28,9 @@ const ALLOWED_KEYS = new Set([
   'organizer_url',
   'recurrence_note',
   'accessibility',
+  'video',
+  'gallery',
+  'coverage_status',
 ])
 
 const LEGACY_KEY_MAP = new Map<string, string>([

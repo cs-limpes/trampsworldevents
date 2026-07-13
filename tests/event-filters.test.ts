@@ -19,35 +19,55 @@ describe('event filters', () => {
   it('searches normalized public fields by token', () => {
     const events = [
       event({
-        id: 'music',
-        title: 'Jazz Night',
-        venue: { name: 'Tower Theatre', city: 'Fresno', neighborhood: 'Tower District', online: false },
-        taxonomy: { primaryCategory: 'music', tags: ['live music'], audience: ['21-plus'], priceType: 'paid' },
+        id: 'cycle',
+        title: 'Bike Night',
+        venue: { name: 'Desert Roadhouse', city: 'Phoenix', state: 'AZ', neighborhood: 'Warehouse District', online: false },
+        taxonomy: {
+          vertical: 'cycletramp',
+          primaryCategory: 'motorcycle-event',
+          tags: ['bike night'],
+          audience: ['21-plus'],
+          priceType: 'paid',
+        },
       }),
       event({ id: 'market', title: 'Saturday Market' }),
     ]
 
-    expect(filterEvents(events, { ...DEFAULT_FILTERS, query: 'tower jazz' }).map((item) => item.id)).toEqual(['music'])
+    expect(filterEvents(events, { ...DEFAULT_FILTERS, query: 'phoenix bike' }).map((item) => item.id)).toEqual(['cycle'])
   })
 
-  it('combines category, city, audience, and price filters', () => {
+  it('combines state, vertical, category, city, audience, and price filters', () => {
     const events = [
       event({
         id: 'match',
-        venue: { city: 'Fresno', online: false },
-        taxonomy: { primaryCategory: 'family', tags: [], audience: ['family-friendly'], priceType: 'free' },
+        venue: { city: 'Lake Havasu City', state: 'AZ', online: false },
+        taxonomy: {
+          vertical: 'rivertramp',
+          primaryCategory: 'boat-water-event',
+          tags: [],
+          audience: ['family-friendly'],
+          priceType: 'free',
+        },
       }),
       event({
         id: 'wrong-price',
-        venue: { city: 'Fresno', online: false },
-        taxonomy: { primaryCategory: 'family', tags: [], audience: ['family-friendly'], priceType: 'paid' },
+        venue: { city: 'Lake Havasu City', state: 'AZ', online: false },
+        taxonomy: {
+          vertical: 'rivertramp',
+          primaryCategory: 'boat-water-event',
+          tags: [],
+          audience: ['family-friendly'],
+          priceType: 'paid',
+        },
       }),
     ]
 
     const filters: FilterState = {
       ...DEFAULT_FILTERS,
-      category: 'family',
-      city: 'Fresno',
+      state: 'AZ',
+      vertical: 'rivertramp',
+      category: 'boat-water-event',
+      city: 'Lake Havasu City',
       audience: 'family-friendly',
       price: 'free',
     }
@@ -57,12 +77,14 @@ describe('event filters', () => {
 
   it('serializes and parses URL query state', () => {
     const filters: FilterState = {
-      query: 'tower music',
+      query: 'desert ride',
       display: 'calendar',
       view: 'this-weekend',
-      category: 'music',
-      city: 'Fresno',
-      neighborhood: 'Tower District',
+      state: 'NV',
+      vertical: 'dirttramp',
+      category: 'off-road-event',
+      city: 'Las Vegas',
+      neighborhood: 'Speedway',
       audience: '21-plus',
       price: 'paid',
     }
@@ -70,6 +92,7 @@ describe('event filters', () => {
     expect(parseFilters(serializeFilters(filters))).toEqual(filters)
     expect(serializeFilters(DEFAULT_FILTERS).toString()).toBe('')
     expect(parseFilters(new URLSearchParams('display=unknown'))).toEqual(DEFAULT_FILTERS)
+    expect(parseFilters(new URLSearchParams('vertical=unsupported&state=TX'))).toEqual(DEFAULT_FILTERS)
   })
 
   it('does not count calendar display mode as an active filter', () => {
@@ -96,19 +119,31 @@ describe('event filters', () => {
     const events = [
       event({
         id: 'match',
-        title: 'Outdoor Market',
+        title: 'Boat Parade',
         start: '2026-09-01T12:00:00-07:00',
         end: '2026-09-01T13:00:00-07:00',
-        venue: { city: 'Fresno', online: false },
-        taxonomy: { primaryCategory: 'markets', tags: [], audience: ['all-ages'], priceType: 'free' },
+        venue: { city: 'Lake Havasu City', state: 'AZ', online: false },
+        taxonomy: {
+          vertical: 'rivertramp',
+          primaryCategory: 'boat-water-event',
+          tags: [],
+          audience: ['all-ages'],
+          priceType: 'free',
+        },
       }),
       event({
-        id: 'wrong-city',
-        title: 'Tower Music',
+        id: 'wrong-state',
+        title: 'River Run',
         start: '2026-07-11T12:00:00-07:00',
         end: '2026-07-11T13:00:00-07:00',
-        venue: { city: 'Clovis', online: false },
-        taxonomy: { primaryCategory: 'markets', tags: [], audience: ['all-ages'], priceType: 'free' },
+        venue: { city: 'Laughlin', state: 'NV', online: false },
+        taxonomy: {
+          vertical: 'rivertramp',
+          primaryCategory: 'boat-water-event',
+          tags: [],
+          audience: ['all-ages'],
+          priceType: 'free',
+        },
       }),
     ]
 
@@ -117,26 +152,36 @@ describe('event filters', () => {
       display: 'calendar',
       query: 'tower music',
       view: 'today',
-      category: 'markets',
-      city: 'Fresno',
+      state: 'AZ',
+      vertical: 'rivertramp',
+      category: 'boat-water-event',
+      city: 'Lake Havasu City',
     }
 
     expect(filterCalendarEvents(events, filters).map((item) => item.id)).toEqual(['match'])
-    expect(getActiveFilterCount(filters)).toBe(2)
+    expect(getActiveFilterCount(filters)).toBe(4)
   })
 
   it('builds filter options from available event data only', () => {
     const options = buildFilterOptions([
       event({
-        venue: { city: 'Clovis', neighborhood: 'Old Town', online: false },
-        taxonomy: { primaryCategory: 'markets', tags: [], audience: ['all-ages'], priceType: 'free' },
+        venue: { city: 'Tucson', state: 'AZ', neighborhood: 'Fairgrounds', online: false },
+        taxonomy: {
+          vertical: 'hotrodtramp',
+          primaryCategory: 'car-show',
+          tags: [],
+          audience: ['all-ages'],
+          priceType: 'free',
+        },
       }),
     ])
 
     expect(options).toMatchObject({
-      categories: ['markets'],
-      cities: ['Clovis'],
-      neighborhoods: ['Old Town'],
+      states: ['AZ', 'CA', 'NV', 'NM', 'unknown'],
+      verticals: ['hotrodtramp', 'cycletramp', 'rivertramp', 'dirttramp', 'unclassified'],
+      categories: ['car-show'],
+      cities: ['Tucson'],
+      neighborhoods: ['Fairgrounds'],
       audiences: ['all-ages'],
       prices: ['free'],
     })
@@ -179,6 +224,7 @@ function event(overrides: Partial<PublicEvent> = {}): PublicEvent {
     multiDay: false,
     status: 'confirmed',
     taxonomy: {
+      vertical: 'unclassified',
       primaryCategory: 'other',
       tags: [],
       audience: ['unknown'],

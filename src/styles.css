@@ -1,20 +1,23 @@
 :root {
-  --palette-milky-aquamarine: #037f8c;
-  --palette-dead-sea: #79dcf2;
-  --palette-midas-gold: #f2b705;
-  --palette-elden-ring: #f28705;
-  --palette-momo-peach: #f27979;
+  --brand-orange: #ff9000;
+  --brand-black: #000000;
+  --brand-white: #ffffff;
+  --vertical-hotrod: #a93218;
+  --vertical-cycle: #006d77;
+  --vertical-river: #0067a5;
+  --vertical-dirt: #7a4b19;
+  --vertical-unclassified: #3f3a34;
 
-  --color-background: #f4fbfb;
+  --color-background: #f7f3ed;
   --color-surface: #ffffff;
-  --color-surface-raised: #fffaf3;
-  --color-text: #1f2426;
-  --color-text-muted: #59666b;
-  --color-border: #c9dfe3;
-  --color-accent: var(--palette-elden-ring);
-  --color-accent-contrast: #251708;
-  --color-focus: var(--palette-milky-aquamarine);
-  --color-link: #075d66;
+  --color-surface-raised: #fff7ec;
+  --color-text: #191715;
+  --color-text-muted: #5f5a52;
+  --color-border: #dac8b4;
+  --color-accent: var(--brand-orange);
+  --color-accent-contrast: var(--brand-black);
+  --color-focus: #007078;
+  --color-link: #7a3a00;
   --color-error: #9d1c1c;
 
   --space-1: 0.25rem;
@@ -100,11 +103,12 @@ summary:focus-visible {
 .wordmark {
   margin: 0;
   color: var(--color-text);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
   font-size: 1.75rem;
   font-weight: 700;
   line-height: 1;
   text-decoration: none;
+  text-transform: uppercase;
 }
 
 .eyebrow {
@@ -127,9 +131,11 @@ p {
 h1 {
   max-width: 48rem;
   margin-bottom: 0;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
   font-size: 2.6rem;
+  font-weight: 700;
   line-height: 1;
+  text-transform: uppercase;
 }
 
 .intro {
@@ -259,7 +265,7 @@ h1 {
   padding: 0 var(--space-3);
   color: var(--color-link);
   background: var(--color-surface-raised);
-  border: 1px solid #efd1ad;
+  border: 1px solid var(--color-border);
   border-radius: 0.5rem;
   font-weight: 800;
 }
@@ -324,8 +330,8 @@ h1 {
   gap: var(--space-2);
   padding: 0 var(--space-3);
   color: var(--color-accent-contrast);
-  background: var(--palette-midas-gold);
-  border: 1px solid #d8a200;
+  background: var(--color-accent);
+  border: 1px solid #d57600;
   border-radius: 0.5rem;
   font-weight: 800;
 }
@@ -380,7 +386,7 @@ h1 {
 
 .calendar-surface .fc .fc-toolbar-title {
   color: var(--color-text);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
   font-size: 1.45rem;
   line-height: 1.1;
 }
@@ -396,7 +402,7 @@ h1 {
 .calendar-surface .fc .fc-button-primary {
   color: var(--color-link);
   background: var(--color-surface-raised);
-  border-color: #efd1ad;
+  border-color: var(--color-border);
 }
 
 .calendar-surface .fc .fc-button-primary:disabled {
@@ -550,7 +556,7 @@ h1 {
   min-width: fit-content;
   padding: var(--space-2) var(--space-3);
   color: var(--color-accent-contrast);
-  background: var(--palette-midas-gold);
+  background: var(--color-accent);
   border-radius: 0.4rem;
   font-weight: 800;
 }
@@ -587,9 +593,41 @@ h1 {
   overflow: hidden;
   color: #ffffff;
   background:
-    linear-gradient(135deg, rgba(3, 127, 140, 0.95), rgba(121, 220, 242, 0.8)),
-    repeating-linear-gradient(45deg, transparent 0 0.65rem, rgba(242, 135, 5, 0.28) 0.65rem 1rem);
+    linear-gradient(135deg, var(--vertical-unclassified), #111111),
+    repeating-linear-gradient(45deg, transparent 0 0.65rem, rgba(255, 144, 0, 0.28) 0.65rem 1rem);
   border-radius: 0.45rem;
+}
+
+.event-visual-hotrodtramp {
+  background:
+    radial-gradient(circle at 50% 48%, rgba(255, 255, 255, 0.18) 0 18%, transparent 19%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.14) 0 0.18rem, transparent 0.18rem 0.7rem),
+    linear-gradient(135deg, var(--vertical-hotrod), #161311);
+}
+
+.event-visual-cycletramp {
+  background:
+    radial-gradient(circle at 50% 50%, transparent 0 28%, rgba(255, 255, 255, 0.24) 29% 33%, transparent 34%),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0 0.2rem, transparent 0.2rem 0.8rem),
+    linear-gradient(135deg, var(--vertical-cycle), #111111);
+}
+
+.event-visual-rivertramp {
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.16) 0 0.16rem, transparent 0.16rem 0.65rem),
+    linear-gradient(135deg, var(--vertical-river), #083047);
+}
+
+.event-visual-dirttramp {
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.16) 0 0.24rem, transparent 0.24rem 0.9rem),
+    linear-gradient(135deg, var(--vertical-dirt), #21150c);
+}
+
+.event-visual-unclassified {
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 144, 0, 0.25) 0 0.3rem, transparent 0.3rem 0.9rem),
+    linear-gradient(135deg, var(--vertical-unclassified), #111111);
 }
 
 .event-visual span {
@@ -621,7 +659,7 @@ h1 {
 .event-meta span {
   padding: 0.2rem 0.5rem;
   background: var(--color-surface-raised);
-  border: 1px solid #efd1ad;
+  border: 1px solid var(--color-border);
   border-radius: 0.35rem;
 }
 
@@ -854,7 +892,7 @@ h1 {
   padding: var(--space-3);
   color: var(--color-text);
   background: var(--color-surface-raised);
-  border: 1px solid #efd1ad;
+  border: 1px solid var(--color-border);
   border-radius: 0.5rem;
 }
 

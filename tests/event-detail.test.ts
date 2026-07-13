@@ -24,7 +24,7 @@ describe('event detail helpers', () => {
 
     expect(url.origin).toBe('https://calendar.google.com')
     expect(url.searchParams.get('action')).toBe('TEMPLATE')
-    expect(url.searchParams.get('text')).toBe('Fresno Event')
+    expect(url.searchParams.get('text')).toBe('TrampsWorld Event')
     expect(url.searchParams.get('dates')).toBe('20260711T190000Z/20260711T210000Z')
   })
 
@@ -37,14 +37,15 @@ describe('event detail helpers', () => {
 
     expect(ics).toContain('DTSTART;VALUE=DATE:20260711')
     expect(ics).toContain('DTEND;VALUE=DATE:20260713')
-    expect(ics).toContain('SUMMARY:Fresno Event')
+    expect(ics).toContain('PRODID:-//TrampsWorld Events//EN')
+    expect(ics).toContain('SUMMARY:TrampsWorld Event')
   })
 
   it('builds map links from venue facts without inventing locations', () => {
     expect(buildMapUrl(event({ venue: undefined }))).toBeUndefined()
-    expect(buildMapUrl(event({ venue: { address: '123 Fulton St', city: 'Fresno', online: false } }))).toContain(
-      'query=123+Fulton+St',
-    )
+    expect(
+      buildMapUrl(event({ venue: { address: '123 Main St', city: 'Phoenix', state: 'AZ', online: false } })),
+    ).toContain('query=123+Main+St')
   })
 
   it('builds conservative structured event data', () => {
@@ -53,7 +54,7 @@ describe('event detail helpers', () => {
     expect(data).toMatchObject({
       '@context': 'https://schema.org',
       '@type': 'Event',
-      name: 'Fresno Event',
+      name: 'TrampsWorld Event',
       startDate: '2026-07-11T12:00:00-07:00',
       url: 'https://example.com/events/test',
     })
@@ -67,25 +68,27 @@ function event(overrides: Partial<PublicEvent> = {}): PublicEvent {
       provider: 'google-calendar',
       eventId: 'event-1',
     },
-    title: 'Fresno Event',
+    title: 'TrampsWorld Event',
     description: 'A public event description.',
     excerpt: 'A public event description.',
     start: '2026-07-11T12:00:00-07:00',
     end: '2026-07-11T14:00:00-07:00',
-    timezone: 'America/Los_Angeles',
+    timezone: 'America/Phoenix',
     allDay: false,
     multiDay: false,
     status: 'confirmed',
     venue: {
       name: 'Tower Theatre',
       address: '815 E Olive Ave',
-      city: 'Fresno',
-      neighborhood: 'Tower District',
+      city: 'Phoenix',
+      state: 'AZ',
+      neighborhood: 'Warehouse District',
       online: false,
     },
     taxonomy: {
-      primaryCategory: 'music',
-      tags: ['live music'],
+      vertical: 'hotrodtramp',
+      primaryCategory: 'car-show',
+      tags: ['cruise night'],
       audience: ['all-ages'],
       priceType: 'free',
     },

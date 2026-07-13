@@ -4,6 +4,8 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import listPlugin from '@fullcalendar/list'
 import type { EventClickArg, EventContentArg, EventMountArg } from '@fullcalendar/core'
 import { AGENDA_TIMEZONE } from '../lib/agenda-sections'
+import { formatFilterLabel } from '../lib/event-filters'
+import { formatEventDateTime } from '../lib/event-time'
 import { toFullCalendarEvents } from '../lib/calendar-events'
 import { getEventDetailPath } from '../lib/event-detail'
 import type { PublicEvent } from '../types/events'
@@ -64,9 +66,11 @@ function CalendarEventContent({ arg }: { arg: EventContentArg }) {
     return <span className="calendar-event-title">{arg.event.title}</span>
   }
 
-  const meta = [arg.timeText, event.allDay ? 'All day' : undefined, event.multiDay ? 'Multi-day' : undefined].filter(
-    Boolean,
-  )
+  const meta = [
+    formatFilterLabel(event.taxonomy.vertical),
+    event.allDay ? 'All day' : formatEventDateTime(event),
+    event.multiDay ? 'Multi-day' : undefined,
+  ].filter(Boolean)
 
   return (
     <span className="calendar-event-content">

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { buildContactDraftResponse, handleContactDraftRequest } from '../worker/routes/contact'
 
 const env = {
-  FRESNO_EVENTS_CONTACT_EMAIL: 'editor@example.test',
+  TRAMPSWORLD_EVENTS_CONTACT_EMAIL: 'editor@example.test',
 }
 
 describe('contact draft route', () => {
@@ -13,7 +13,7 @@ describe('contact draft route', () => {
         eventTitle: 'Summer Scare',
         eventUrl: 'https://example.com/events/summer-scare',
         eventDate: 'July 12, 2026, 6 PM',
-        venue: 'Fresno',
+        venue: 'Phoenix',
         details: 'The end time should be 11 PM.',
         senderName: 'Reader',
         senderEmail: 'reader@example.test',
@@ -57,7 +57,7 @@ describe('contact draft route', () => {
 
     expect(new URL(result.response.mailtoUrl).searchParams.get('subject')).toBe('Event lead: Neighborhood Art Walk')
     expect(body).toContain('Type: Event lead')
-    expect(body).toContain('New events are reviewed before appearing on Fresno Events.')
+    expect(body).toContain('New events are reviewed before appearing on TrampsWorld Events.')
   })
 
   it('rejects empty requests', async () => {

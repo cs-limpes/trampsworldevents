@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon'
 import type { PublicEvent } from '../types/events'
+import { SITE_REFERENCE_TIMEZONE } from './timezones'
 
-export const AGENDA_TIMEZONE = 'America/Los_Angeles'
+export const AGENDA_TIMEZONE = SITE_REFERENCE_TIMEZONE
 type AnyDateTime = DateTime<boolean>
 
 export type AgendaSectionId = 'today' | 'this-weekend' | 'upcoming'

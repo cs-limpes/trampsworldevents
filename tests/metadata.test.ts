@@ -7,12 +7,16 @@ describe('metadata parser', () => {
 
 ---
 category: music
+state: Arizona
+vertical: CycleTramp
 tags: live music, local, live music
 price: paid
 unknown_key: ignored`)
 
     expect(parsed.publicDescription).toBe('Join us downtown.')
     expect(parsed.fields.category).toBe('music')
+    expect(parsed.fields.state).toBe('Arizona')
+    expect(parsed.fields.vertical).toBe('CycleTramp')
     expect(parseList(parsed.fields.tags)).toEqual(['live music', 'local'])
     expect(parsed.fields.price).toBe('paid')
     expect(parsed.fields.unknown_key).toBeUndefined()

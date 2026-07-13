@@ -49,7 +49,7 @@ async function findEventForShell(pathname: string, origin: string, env: Env): Pr
 
 function buildEventMetadata(event: PublicEvent, origin: string): PageMetadata {
   return {
-    title: `${event.title} | Fresno Events`,
+    title: `${event.title} | TrampsWorld Events`,
     description: getEventSummary(event),
     url: getEventCanonicalUrl(event, origin),
     type: 'article',
@@ -58,8 +58,8 @@ function buildEventMetadata(event: PublicEvent, origin: string): PageMetadata {
 
 function buildDefaultMetadata(url: URL): PageMetadata {
   return {
-    title: 'Fresno Events',
-    description: 'A live local agenda for Fresno, Clovis, and nearby Central Valley communities.',
+    title: 'TrampsWorld Events',
+    description: 'A live regional agenda for Arizona, California, Nevada, and New Mexico.',
     url: `${url.origin}${url.pathname}`,
     type: 'website',
   }
@@ -67,8 +67,8 @@ function buildDefaultMetadata(url: URL): PageMetadata {
 
 function buildContactMetadata(url: URL): PageMetadata {
   return {
-    title: 'Send Event Updates | Fresno Events',
-    description: 'Send Fresno Events a correction or a new event lead for editorial review.',
+    title: 'Send Event Updates | TrampsWorld Events',
+    description: 'Send TrampsWorld Events a correction or a new event lead for editorial review.',
     url: `${url.origin}${url.pathname}`,
     type: 'website',
   }

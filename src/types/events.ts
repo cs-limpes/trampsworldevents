@@ -1,18 +1,15 @@
 export type EventCategory =
-  | 'art'
-  | 'music'
-  | 'food-drink'
-  | 'markets'
-  | 'festivals'
-  | 'family'
+  | 'car-show'
+  | 'motorcycle-event'
+  | 'boat-water-event'
+  | 'off-road-event'
+  | 'race'
+  | 'rally-ride'
+  | 'meet-cruise'
+  | 'festival'
+  | 'expo-trade-show'
+  | 'swap-meet-market'
   | 'community'
-  | 'classes-workshops'
-  | 'nightlife'
-  | 'outdoors'
-  | 'sports'
-  | 'wellness'
-  | 'spiritual'
-  | 'theater-film'
   | 'other'
 
 export type EventAudience =
@@ -33,6 +30,15 @@ export type EventPriceType =
 
 export type EventStatus = 'confirmed' | 'tentative' | 'cancelled'
 
+export type TrampsWorldState = 'AZ' | 'CA' | 'NV' | 'NM' | 'unknown'
+
+export type TrampsWorldVertical =
+  | 'hotrodtramp'
+  | 'cycletramp'
+  | 'rivertramp'
+  | 'dirttramp'
+  | 'unclassified'
+
 export type PublicEvent = {
   id: string
   source: {
@@ -50,7 +56,7 @@ export type PublicEvent = {
 
   start: string
   end: string
-  timezone: 'America/Los_Angeles'
+  timezone?: string
   allDay: boolean
   multiDay: boolean
   status: EventStatus
@@ -59,12 +65,15 @@ export type PublicEvent = {
     name?: string
     address?: string
     city?: string
+    state: TrampsWorldState
+    region?: string
     neighborhood?: string
     mapUrl?: string
     online: boolean
   }
 
   taxonomy: {
+    vertical: TrampsWorldVertical
     primaryCategory: EventCategory
     tags: string[]
     audience: EventAudience[]
@@ -88,13 +97,15 @@ export type PublicEvent = {
     imageUrl?: string
     imageAlt?: string
     flyerUrl?: string
-    categoryArtKey: string
+    visualKey: string
   }
 
   links: {
     sourceUrl?: string
     registrationUrl?: string
     websiteUrl?: string
+    videoUrl?: string
+    galleryUrl?: string
   }
 
   editorial: {
@@ -102,6 +113,7 @@ export type PublicEvent = {
     promoted: boolean
     sponsored: boolean
     sponsorName?: string
+    coverageStatus?: 'none' | 'planned' | 'published'
   }
 
   accessibility?: {
@@ -117,7 +129,7 @@ export type EventsResponse = {
   range: {
     start: string
     end: string
-    timezone: 'America/Los_Angeles'
+    timezone: string
   }
   generatedAt: string
 }

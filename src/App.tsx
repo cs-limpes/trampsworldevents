@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
-import type { DateTime } from 'luxon'
 import { EventCalendarView } from './components/event-calendar-view'
 import type { AgendaSection } from './lib/agenda-sections'
 import { uniqueEventsById } from './lib/calendar-events'
+import { formatKnownState, formatStateLabel, formatVerticalLabel } from './lib/event-taxonomy'
 import {
   buildGoogleCalendarUrl,
   buildIcsDataUrl,
@@ -15,6 +15,7 @@ import {
   getEventSummary,
   slugifyTitle,
 } from './lib/event-detail'
+import { formatDateTimeRange, formatEventDateTime, formatResponseRange, getDateBadge } from './lib/event-time'
 import {
   buildFilterOptions,
   DATE_VIEW_OPTIONS,
@@ -95,7 +96,7 @@ export function App() {
       <header className="site-header">
         <div className="masthead">
           <a className="wordmark" href="/">
-            Fresno Events
+            TrampsWorld Events
           </a>
           <p className="eyebrow">Today, This Weekend, and Upcoming</p>
         </div>
@@ -116,7 +117,7 @@ export function App() {
           {state.status === 'empty' && (
             <StatusMessage
               title="No events found"
-              body={`No events were returned for ${formatRange(state.data.range.start, state.data.range.end)}.`}
+              body={`No events were returned for ${formatResponseRange(state.data.range.start, state.data.range.end)}.`}
             />
           )}
 
@@ -130,10 +131,10 @@ export function App() {
       )}
 
       <footer className="site-footer">
-        <nav aria-label="Fresno Events links">
+        <nav aria-label="TrampsWorld Events links">
           <a href="/contact">Send a correction or event lead</a>
         </nav>
-        <p>Fresno Events is in early development. Event facts come from the approved editorial calendar.</p>
+        <p>TrampsWorld Events is in early development. Event facts come from the approved editorial calendar.</p>
       </footer>
     </main>
   )
@@ -148,7 +149,7 @@ function getPageHeading(route: AppRoute, detailEvent?: PublicEvent): string {
     return 'Send a correction or event lead.'
   }
 
-  return 'Find what is happening around Fresno.'
+  return 'Find road, water, and dirt events across the Southwest.'
 }
 
 function getPageIntro(route: AppRoute, detailEvent?: PublicEvent): string {
@@ -157,10 +158,10 @@ function getPageIntro(route: AppRoute, detailEvent?: PublicEvent): string {
   }
 
   if (route.kind === 'contact') {
-    return 'Help keep Fresno Events accurate with a correction, missing detail, or new event for editorial review.'
+    return 'Help keep TrampsWorld Events accurate with a correction, missing detail, or new event for editorial review.'
   }
 
-  return 'A live local agenda for Fresno, Clovis, and nearby Central Valley communities.'
+  return 'A live regional agenda for Arizona, California, Nevada, and New Mexico.'
 }
 
 function EventDetailPage({ data, pathname }: { data: EventsResponse; pathname: string }) {
@@ -218,12 +219,14 @@ function EventDetail({ event }: { event: PublicEvent }) {
       </a>
 
       <div className="event-detail-hero">
-        <div className="event-visual event-detail-visual" aria-hidden="true">
+        <div className={`${getEventVisualClass(event)} event-detail-visual`} aria-hidden="true">
           <span>{getDateBadge(event).month}</span>
           <strong>{getDateBadge(event).day}</strong>
         </div>
         <div>
           <div className="event-meta">
+            <span>{formatVerticalLabel(event.taxonomy.vertical)}</span>
+            <span>{formatStateLabel(event.venue?.state ?? 'unknown')}</span>
             <span>{formatCategory(event.taxonomy.primaryCategory)}</span>
             <span>{formatPrice(event.taxonomy.priceType)}</span>
             {event.taxonomy.audience.map((audience) => (
@@ -277,43 +280,47 @@ function EventDetail({ event }: { event: PublicEvent }) {
         </aside>
       </div>
 
-      {(event.organizer?.name || event.accessibility?.text || event.editorial.sponsored || event.editorial.promoted) && (
-        <section className="event-detail-section" aria-labelledby="event-notes-heading">
-          <h3 id="event-notes-heading">Details</h3>
-          <dl className="detail-list">
-            {event.organizer?.name && (
-              <>
-                <dt>Organizer</dt>
-                <dd>
-                  {event.organizer.url ? (
-                    <a href={event.organizer.url} target="_blank" rel="noreferrer">
-                      {event.organizer.name}
-                    </a>
-                  ) : (
-                    event.organizer.name
-                  )}
-                </dd>
-              </>
-            )}
-            {event.accessibility?.text && (
-              <>
-                <dt>Accessibility</dt>
-                <dd>{event.accessibility.text}</dd>
-              </>
-            )}
-            {(event.editorial.sponsored || event.editorial.promoted) && (
-              <>
-                <dt>Disclosure</dt>
-                <dd>
-                  {event.editorial.sponsored
-                    ? `Sponsored${event.editorial.sponsorName ? ` by ${event.editorial.sponsorName}` : ''}`
-                    : 'Promoted'}
-                </dd>
-              </>
-            )}
-          </dl>
-        </section>
-      )}
+      <section className="event-detail-section" aria-labelledby="event-notes-heading">
+        <h3 id="event-notes-heading">Details</h3>
+        <dl className="detail-list">
+          <dt>Vertical</dt>
+          <dd>{formatVerticalLabel(event.taxonomy.vertical)}</dd>
+          <dt>State</dt>
+          <dd>{formatStateLabel(event.venue?.state ?? 'unknown')}</dd>
+          <dt>Category</dt>
+          <dd>{formatCategory(event.taxonomy.primaryCategory)}</dd>
+          {event.organizer?.name && (
+            <>
+              <dt>Organizer</dt>
+              <dd>
+                {event.organizer.url ? (
+                  <a href={event.organizer.url} target="_blank" rel="noreferrer">
+                    {event.organizer.name}
+                  </a>
+                ) : (
+                  event.organizer.name
+                )}
+              </dd>
+            </>
+          )}
+          {event.accessibility?.text && (
+            <>
+              <dt>Accessibility</dt>
+              <dd>{event.accessibility.text}</dd>
+            </>
+          )}
+          {(event.editorial.sponsored || event.editorial.promoted) && (
+            <>
+              <dt>Disclosure</dt>
+              <dd>
+                {event.editorial.sponsored
+                  ? `Sponsored${event.editorial.sponsorName ? ` by ${event.editorial.sponsorName}` : ''}`
+                  : 'Promoted'}
+              </dd>
+            </>
+          )}
+        </dl>
+      </section>
     </article>
   )
 }
@@ -322,7 +329,7 @@ function EventNotFound() {
   return (
     <section className="filter-empty-state" aria-labelledby="event-not-found-heading">
       <h2 id="event-not-found-heading">Event not found</h2>
-      <p>This event is not available in the current Fresno Events feed. It may have expired or been removed.</p>
+      <p>This event is not available in the current TrampsWorld Events feed. It may have expired or been removed.</p>
       <a className="secondary-button detail-action-link" href="/">
         Browse current events
       </a>
@@ -599,7 +606,7 @@ function AgendaSections({ data }: { data: EventsResponse }) {
         </div>
         <p>
           {totalEvents} of {unfilteredTotal} {unfilteredTotal === 1 ? 'event' : 'events'} from{' '}
-          {formatRange(data.range.start, data.range.end)}
+          {formatResponseRange(data.range.start, data.range.end)}
         </p>
       </div>
 
@@ -725,6 +732,20 @@ function FilterPanel({
         )}
 
         <div className="facet-grid">
+          <FilterSelect
+            id="vertical-filter"
+            label="Vertical"
+            value={filters.vertical}
+            options={options.verticals}
+            onChange={(vertical) => onChange({ vertical: vertical as FilterState['vertical'] }, 'push')}
+          />
+          <FilterSelect
+            id="state-filter"
+            label="State"
+            value={filters.state}
+            options={options.states}
+            onChange={(state) => onChange({ state: state as FilterState['state'] }, 'push')}
+          />
           <FilterSelect
             id="category-filter"
             label="Category"
@@ -888,12 +909,14 @@ function EventListItem({ event }: { event: PublicEvent }) {
     <li className="event-item">
       <article>
         <div className="event-card-layout">
-          <div className="event-visual" aria-hidden="true">
+          <div className={getEventVisualClass(event)} aria-hidden="true">
             <span>{dateBadge.month}</span>
             <strong>{dateBadge.day}</strong>
           </div>
           <div className="event-content">
             <div className="event-meta">
+              <span>{formatVerticalLabel(event.taxonomy.vertical)}</span>
+              <span>{formatStateLabel(event.venue?.state ?? 'unknown')}</span>
               <span>{formatCategory(event.taxonomy.primaryCategory)}</span>
               <span>{formatPrice(event.taxonomy.priceType)}</span>
               {event.allDay && <span>All day</span>}
@@ -935,68 +958,6 @@ function StatusMessage({ title, body, tone = 'neutral' }: { title: string; body:
   )
 }
 
-function formatRange(start: string, end: string): string {
-  return `${formatDate(start)} through ${formatDate(end)}`
-}
-
-function formatDateTimeRange(start: DateTime<boolean>, end: DateTime<boolean>): string {
-  return `${formatDateTime(start)} through ${formatDateTime(end)}`
-}
-
-function formatDateTime(value: DateTime<boolean>): string {
-  return value.toLocaleString({
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  })
-}
-
-function formatEventDateTime(event: PublicEvent): string {
-  if (event.allDay) {
-    return event.multiDay
-      ? `${formatDate(event.start)} through ${formatDate(subtractOneDay(event.end))}`
-      : formatDate(event.start)
-  }
-
-  return `${formatDate(event.start)} at ${formatTime(event.start)}`
-}
-
-function formatDate(value: string): string {
-  const date = isDateOnly(value) ? dateOnlyToSafeDate(value) : new Date(value)
-
-  return new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Los_Angeles',
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(date)
-}
-
-function formatTime(value: string): string {
-  return new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Los_Angeles',
-    hour: 'numeric',
-    minute: '2-digit',
-  }).format(new Date(value))
-}
-
-function getDateBadge(event: PublicEvent): { month: string; day: string } {
-  const date = isDateOnly(event.start) ? dateOnlyToSafeDate(event.start) : new Date(event.start)
-
-  return {
-    month: new Intl.DateTimeFormat('en-US', {
-      timeZone: 'America/Los_Angeles',
-      month: 'short',
-    }).format(date),
-    day: new Intl.DateTimeFormat('en-US', {
-      timeZone: 'America/Los_Angeles',
-      day: 'numeric',
-    }).format(date),
-  }
-}
-
 function formatCategory(value: string): string {
   return formatFilterLabel(value)
 }
@@ -1006,7 +967,13 @@ function formatPrice(value: string): string {
 }
 
 function formatLocation(event: PublicEvent): string | undefined {
-  const parts = [event.venue?.name, event.venue?.neighborhood, event.venue?.city, event.venue?.online ? 'Online' : undefined].filter(Boolean)
+  const parts = [
+    event.venue?.name,
+    event.venue?.neighborhood,
+    event.venue?.city,
+    formatKnownState(event.venue?.state),
+    event.venue?.online ? 'Online' : undefined,
+  ].filter(Boolean)
 
   return parts.length > 0 ? parts.join(' - ') : undefined
 }
@@ -1016,27 +983,13 @@ function getEventLinks(event: PublicEvent): Array<{ label: string; href: string 
     event.links.sourceUrl ? { label: 'Official event', href: event.links.sourceUrl } : undefined,
     event.links.registrationUrl ? { label: 'Registration', href: event.links.registrationUrl } : undefined,
     event.links.websiteUrl ? { label: 'Website', href: event.links.websiteUrl } : undefined,
+    event.links.videoUrl ? { label: 'Video', href: event.links.videoUrl } : undefined,
+    event.links.galleryUrl ? { label: 'Gallery', href: event.links.galleryUrl } : undefined,
   ].filter((link): link is { label: string; href: string } => Boolean(link))
 }
 
-function isDateOnly(value: string): boolean {
-  return /^\d{4}-\d{2}-\d{2}$/.test(value)
-}
-
-function dateOnlyToSafeDate(value: string): Date {
-  const [year, month, day] = value.split('-').map(Number)
-  return new Date(Date.UTC(year, month - 1, day, 12))
-}
-
-function subtractOneDay(value: string): string {
-  if (!isDateOnly(value)) {
-    return value
-  }
-
-  const date = dateOnlyToSafeDate(value)
-  date.setUTCDate(date.getUTCDate() - 1)
-
-  return date.toISOString().slice(0, 10)
+function getEventVisualClass(event: PublicEvent): string {
+  return `event-visual event-visual-${event.taxonomy.vertical}`
 }
 
 function readFiltersFromUrl(): FilterState {
@@ -1060,6 +1013,10 @@ function getActiveFilterChips(filters: FilterState): Array<{ key: ActiveFilterKe
     filters.display === 'agenda' && filters.view !== 'all'
       ? { key: 'view' as const, label: `Date: ${DATE_VIEW_OPTIONS.find((option) => option.value === filters.view)?.label}` }
       : undefined,
+    filters.vertical
+      ? { key: 'vertical' as const, label: `Vertical: ${formatVerticalLabel(filters.vertical)}` }
+      : undefined,
+    filters.state ? { key: 'state' as const, label: `State: ${formatStateLabel(filters.state)}` } : undefined,
     filters.category ? { key: 'category' as const, label: `Category: ${formatFilterLabel(filters.category)}` } : undefined,
     filters.city ? { key: 'city' as const, label: `City: ${filters.city}` } : undefined,
     filters.neighborhood ? { key: 'neighborhood' as const, label: `Neighborhood: ${filters.neighborhood}` } : undefined,
@@ -1098,17 +1055,17 @@ function readAppRoute(): AppRoute {
 function usePageMetadata(route: AppRoute, event?: PublicEvent): void {
   useEffect(() => {
     const title = event
-      ? `${event.title} | Fresno Events`
+      ? `${event.title} | TrampsWorld Events`
       : route.kind === 'event-detail'
-        ? 'Event not found | Fresno Events'
+        ? 'Event not found | TrampsWorld Events'
         : route.kind === 'contact'
-          ? 'Send Event Updates | Fresno Events'
-          : 'Fresno Events'
+          ? 'Send Event Updates | TrampsWorld Events'
+          : 'TrampsWorld Events'
     const description = event
       ? getEventSummary(event)
       : route.kind === 'contact'
-        ? 'Send Fresno Events a correction or a new event lead for editorial review.'
-        : 'A live local agenda for Fresno, Clovis, and nearby Central Valley communities.'
+        ? 'Send TrampsWorld Events a correction or a new event lead for editorial review.'
+        : 'A live regional agenda for Arizona, California, Nevada, and New Mexico.'
     const url = event ? getEventCanonicalUrl(event, window.location.origin) : `${window.location.origin}${route.pathname}`
 
     document.title = title
