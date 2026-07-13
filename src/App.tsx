@@ -5,7 +5,6 @@ import { uniqueEventsById } from './lib/calendar-events'
 import { formatKnownState, formatStateLabel, formatVerticalLabel } from './lib/event-taxonomy'
 import {
   buildGoogleCalendarUrl,
-  buildIcsDataUrl,
   buildMapUrl,
   buildStructuredEventData,
   findEventByDetailPath,
@@ -180,7 +179,6 @@ function EventDetail({ event }: { event: PublicEvent }) {
   const mapUrl = buildMapUrl(event)
   const eventLinks = getEventLinks(event)
   const calendarUrl = buildGoogleCalendarUrl(event, eventUrl)
-  const icsUrl = buildIcsDataUrl(event, eventUrl)
   const location = formatEventLocation(event)
   const structuredData = buildStructuredEventData(event, eventUrl)
 
@@ -256,9 +254,6 @@ function EventDetail({ event }: { event: PublicEvent }) {
         <aside className="event-detail-actions" aria-label="Event actions">
           <a className="primary-action" href={calendarUrl} target="_blank" rel="noreferrer">
             Add to Google Calendar
-          </a>
-          <a className="secondary-button detail-action-link" href={icsUrl} download={`${slugifyTitle(event.title)}.ics`}>
-            Download .ics
           </a>
           {mapUrl && (
             <a className="secondary-button detail-action-link" href={mapUrl} target="_blank" rel="noreferrer">

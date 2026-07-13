@@ -1,0 +1,31 @@
+
+> trampsworld-events@0.1.0 dev
+> npm run build && wrangler dev
+
+
+> trampsworld-events@0.1.0 build
+> tsc --noEmit && vite build
+
+[36mvite v7.3.6 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32m✓[39m 52 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                 [39m[1m[2m  0.58 kB[22m[1m[22m[2m │ gzip:   0.36 kB[22m
+[2mdist/[22m[35massets/index-BXc3SC3Y.css  [39m[1m[2m 17.40 kB[22m[1m[22m[2m │ gzip:   3.48 kB[22m
+[2mdist/[22m[36massets/index-CFbPm-To.js   [39m[1m[33m501.24 kB[39m[22m[2m │ gzip: 154.21 kB[22m
+[32m✓ built in 5.73s[39m
+
+ ⛅️ wrangler 4.110.0
+────────────────────
+Using secrets defined in .dev.vars
+Your Worker has access to the following bindings:
+Binding                                                Resource                  Mode
+env.ASSETS                                             Assets                    local
+env.GOOGLE_CALENDAR_ID ("(hidden)")                    Environment Variable      local
+env.GOOGLE_CALENDAR_API_KEY ("(hidden)")               Environment Variable      local
+env.GOOGLE_CALENDAR_TIMEZONE ("(hidden)")              Environment Variable      local
+env.TRAMPSWORLD_EVENTS_CONTACT_EMAIL ("(hidden)")      Environment Variable      local
+
+⎔ Starting local server...
+[wrangler:info] Ready on http://127.0.0.1:8789
