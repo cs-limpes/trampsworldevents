@@ -685,7 +685,7 @@ function FilterPanel({
   totalCount: number
 }) {
   return (
-    <details className="filters-panel" open>
+    <details className="filters-panel">
       <summary>
         <span>Search and filter</span>
         <span>{activeFilterCount > 0 ? `${activeFilterCount} active` : 'All events'}</span>
