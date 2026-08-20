@@ -1,4 +1,4 @@
-import type { EventInput } from '@fullcalendar/core'
+import type { CalendarApi, EventInput, EventSourceApi } from '@fullcalendar/core'
 import type { PublicEvent } from '../types/events'
 import { toCalendarLocalDateTime } from './event-time'
 
@@ -44,4 +44,12 @@ export function toFullCalendarEvents(
       publicEvent: event,
     },
   }))
+}
+
+export function replaceFullCalendarEvents(
+  calendar: Pick<CalendarApi, 'addEventSource' | 'removeAllEvents'>,
+  events: TrampsWorldCalendarEventInput[],
+): EventSourceApi {
+  calendar.removeAllEvents()
+  return calendar.addEventSource(events)
 }

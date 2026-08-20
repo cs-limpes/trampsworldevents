@@ -595,17 +595,47 @@ h1 {
   gap: 0.15rem;
   width: 100%;
   padding: var(--space-1) var(--space-2);
-  color: var(--color-text);
+  color: var(--brand-white);
   line-height: 1.25;
   text-decoration: none;
   overflow-wrap: anywhere;
-  background: var(--color-surface-raised);
-  border-left: 3px solid var(--color-accent);
+  background: var(--vertical-unclassified);
+  border-left: 3px solid var(--brand-orange);
   border-radius: 0.35rem;
 }
 
+.calendar-surface .fc .calendar-vertical-hotrodtramp .calendar-event-content {
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0 0.12rem, transparent 0.12rem 0.55rem),
+    var(--vertical-hotrod);
+}
+
+.calendar-surface .fc .calendar-vertical-cycletramp .calendar-event-content {
+  background:
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.09) 0 0.15rem, transparent 0.15rem 0.65rem),
+    var(--vertical-cycle);
+}
+
+.calendar-surface .fc .calendar-vertical-rivertramp .calendar-event-content {
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.11) 0 0.12rem, transparent 0.12rem 0.55rem),
+    var(--vertical-river);
+}
+
+.calendar-surface .fc .calendar-vertical-dirttramp .calendar-event-content {
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0 0.18rem, transparent 0.18rem 0.75rem),
+    var(--vertical-dirt);
+}
+
+.calendar-surface .fc .calendar-vertical-unclassified .calendar-event-content {
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 144, 0, 0.2) 0 0.18rem, transparent 0.18rem 0.7rem),
+    var(--vertical-unclassified);
+}
+
 .calendar-surface .fc .fc-event:hover .calendar-event-content {
-  background: #fff2dc;
+  box-shadow: inset 0 0 0 999px rgba(255, 255, 255, 0.1);
 }
 
 .calendar-surface .fc .fc-event:focus-visible {
@@ -614,9 +644,11 @@ h1 {
 }
 
 .calendar-event-meta {
-  color: var(--color-text-muted);
+  color: rgba(255, 255, 255, 0.86);
   font-size: 0.74rem;
   font-weight: 800;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
 }
 
 .calendar-event-title {

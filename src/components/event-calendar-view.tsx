@@ -1,20 +1,31 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import listPlugin from '@fullcalendar/list'
 import type { EventClickArg, EventContentArg, EventMountArg } from '@fullcalendar/core'
 import { AGENDA_TIMEZONE } from '../lib/agenda-sections'
-import { toFullCalendarEvents } from '../lib/calendar-events'
+import { replaceFullCalendarEvents, toFullCalendarEvents } from '../lib/calendar-events'
 import { getEventDetailPath } from '../lib/event-detail'
+import { formatVerticalLabel } from '../lib/event-taxonomy'
 import type { PublicEvent } from '../types/events'
 import { PlannedCoverageBadge } from './planned-coverage-badge'
 
 export function EventCalendarView({ events, currentSearch }: { events: PublicEvent[]; currentSearch: string }) {
   const [calendarView, setCalendarView] = useState(getPreferredCalendarView)
+  const calendarRef = useRef<FullCalendar>(null)
   const calendarEvents = useMemo(
     () => toFullCalendarEvents(events, { getUrl: (event) => `${getEventDetailPath(event)}${currentSearch}` }),
     [currentSearch, events],
   )
+
+  useEffect(() => {
+    const calendar = calendarRef.current?.getApi()
+
+    if (calendar) {
+      const eventSource = replaceFullCalendarEvents(calendar, calendarEvents)
+      return () => eventSource.remove()
+    }
+  }, [calendarEvents, calendarView])
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(max-width: 38rem)')
@@ -40,6 +51,7 @@ export function EventCalendarView({ events, currentSearch }: { events: PublicEve
 
       <div className="calendar-surface">
         <FullCalendar
+          ref={calendarRef}
           key={calendarView}
           plugins={[dayGridPlugin, listPlugin]}
           initialView={calendarView}
@@ -53,7 +65,7 @@ export function EventCalendarView({ events, currentSearch }: { events: PublicEve
             month: 'Month',
             list: 'List',
           }}
-          events={calendarEvents}
+          initialEvents={calendarEvents}
           eventClick={openCalendarEvent}
           eventContent={(arg) => <CalendarEventContent arg={arg} />}
           eventDidMount={prepareCalendarEvent}
@@ -87,6 +99,7 @@ function CalendarEventContent({ arg }: { arg: EventContentArg }) {
 
   return (
     <span className="calendar-event-content">
+      <span className="calendar-event-meta">{formatVerticalLabel(event.taxonomy.vertical)}</span>
       <span className="calendar-event-title">{event.title}</span>
       {event.editorial.coverageStatus === 'planned' && <PlannedCoverageBadge compact />}
     </span>

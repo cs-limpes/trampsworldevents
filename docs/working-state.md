@@ -58,6 +58,8 @@ Completed changes include:
 - planned attendance is maintained in Google Calendar description metadata with `coverage_status: planned`; current-month appearances are spotlighted automatically and later appearances are collapsed by default
 - live Google Calendar normalization now preserves hybrid legacy-plus-delimited metadata, reads postal state segments such as `AZ 86442`, and conservatively derives verticals from unmistakable category metadata when `vertical` is absent
 - State and Vertical dropdowns now expose only values represented in the loaded event set, matching the existing data-driven behavior of the other facet dropdowns
+- FullCalendar now explicitly replaces its internal event collection when facet filters change, so Calendar and Agenda views stay synchronized without resetting the selected calendar date or view
+- FullCalendar month and list entries use the same vertical colors and controlled motifs as Agenda cards, with a visible vertical label so classification does not rely on color alone
 
 ## Live event verification
 
