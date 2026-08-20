@@ -125,6 +125,63 @@ vertical: SpaceTramp`,
     expect(event?.taxonomy.vertical).toBe('unclassified')
   })
 
+  it('reads state and city from a normal Google postal location', () => {
+    const source: GoogleCalendarEvent = {
+      id: 'postal-location',
+      summary: 'Cars and Coffee',
+      description: `Every Saturday morning.
+
+Type: recurring_event
+Category: Cars & Coffee`,
+      location: 'Outlaw Donuts, 414 W Goodwin St, Prescott, AZ 86303, USA',
+      start: { dateTime: '2026-08-22T07:00:00-07:00' },
+      end: { dateTime: '2026-08-22T09:00:00-07:00' },
+      status: 'confirmed',
+    }
+
+    const event = normalizeGoogleEvent(source)
+
+    expect(event?.venue).toMatchObject({ city: 'Prescott', state: 'AZ' })
+  })
+
+  it.each([
+    ['Car Show', 'hotrodtramp'],
+    ['Cruise-In', 'hotrodtramp'],
+    ['Motorcycle Event', 'cycletramp'],
+    ['water sports', 'rivertramp'],
+    ['off road', 'dirttramp'],
+  ] as const)('infers %s events into the conservative %s vertical fallback', (category, vertical) => {
+    const source: GoogleCalendarEvent = {
+      id: `inferred-${vertical}`,
+      summary: 'Representative live event',
+      description: `Event details.
+
+Type: event
+Category: ${category}`,
+      start: { dateTime: '2026-09-12T09:00:00-07:00' },
+      end: { dateTime: '2026-09-12T12:00:00-07:00' },
+      status: 'confirmed',
+    }
+
+    expect(normalizeGoogleEvent(source)?.taxonomy.vertical).toBe(vertical)
+  })
+
+  it('does not infer a vertical from an ambiguous category', () => {
+    const source: GoogleCalendarEvent = {
+      id: 'ambiguous-race',
+      summary: 'Regional Racing Series',
+      description: `Event details.
+
+Type: event
+Category: Race`,
+      start: { dateTime: '2026-09-12T09:00:00-07:00' },
+      end: { dateTime: '2026-09-12T12:00:00-07:00' },
+      status: 'confirmed',
+    }
+
+    expect(normalizeGoogleEvent(source)?.taxonomy.vertical).toBe('unclassified')
+  })
+
   it('expands recurring Pacific events across daylight saving changes in event-local time', () => {
     const source: GoogleCalendarEvent = {
       id: 'spring-ride',
@@ -188,7 +245,7 @@ Recurrence note: Wednesdays weekly, 4:30-6:00 PM`,
       multiDay: false,
       venue: { city: 'Phoenix', state: 'AZ' },
       taxonomy: {
-        vertical: 'unclassified',
+        vertical: 'cycletramp',
         primaryCategory: 'motorcycle-event',
         audience: ['21-plus'],
         priceType: 'donation',

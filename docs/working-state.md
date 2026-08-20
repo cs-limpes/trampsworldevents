@@ -56,6 +56,14 @@ Completed changes include:
 - the browse page includes a compact "On the Road with TrampsWorld" schedule for upcoming events marked as planned coverage
 - Agenda and FullCalendar presentations show a Scamp attendance indicator only for planned-coverage events
 - planned attendance is maintained in Google Calendar description metadata with `coverage_status: planned`; current-month appearances are spotlighted automatically and later appearances are collapsed by default
+- live Google Calendar normalization now preserves hybrid legacy-plus-delimited metadata, reads postal state segments such as `AZ 86442`, and conservatively derives verticals from unmistakable category metadata when `vertical` is absent
+- State and Vertical dropdowns now expose only values represented in the loaded event set, matching the existing data-driven behavior of the other facet dropdowns
+
+## Live event verification
+
+The configured local Worker was verified against 826 live Google Calendar occurrences on 2026-08-20. Before the normalization fix, every occurrence returned `vertical: unclassified`, 746 returned `state: unknown`, and the HotRodTramp filter necessarily returned zero. The source descriptions contained category metadata on 823 occurrences but no `vertical`, `state`, `audience`, or `price` keys. Sixteen planned-coverage descriptions combined legacy metadata before `---` with `coverage_status` after it.
+
+After the fix, the same feed returned 676 HotRodTramp, 63 CycleTramp, 1 RiverTramp, and 86 unclassified occurrences; state normalization returned 729 AZ, 20 CA, 3 NV, and 74 unknown. Missing audience and price metadata still intentionally normalize to `unknown` unless supported by conservative description or legacy price-text parsing.
 
 ## Current architecture
 
@@ -92,7 +100,7 @@ Known public Fresno production identity has been removed from application code, 
 
 ## Current task
 
-Phase B: TrampsWorld conversion is complete in the repository. The authorized Phase D planned-coverage slice is implemented locally for review.
+Phase B: TrampsWorld conversion is complete in the repository. The authorized Phase D planned-coverage slice and the live event normalization/filter availability corrections are implemented locally for review.
 
 Do not deploy or begin Phase C unless explicitly authorized.
 
@@ -105,7 +113,7 @@ Do not deploy or begin Phase C unless explicitly authorized.
 - Contact flow remains a mailto handoff, not a server-side relay.
 - Production caching policy may still need explicit review.
 - The cloned repository has not yet been deployed independently.
-- Live Google Calendar and Cloudflare integration were not tested during Phase B verification.
+- Independent deployed Cloudflare integration has not yet been tested; the configured local Worker has been tested against the live Google Calendar feed.
 - In-app browser localhost smoke testing was blocked by the browser URL policy; automated tests cover the filter, URL-state, detail, contact, timezone, all-day, recurrence, and calendar mapping behavior.
 
 ## Do not revisit without new evidence

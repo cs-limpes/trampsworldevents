@@ -52,6 +52,29 @@ No specific year or end date for recurrence provided.`)
     expect(parsed.publicDescription).not.toContain('Reviewed ambiguity notes')
   })
 
+  it('combines legacy metadata before a delimiter with new metadata after it', () => {
+    const parsed = parseEventDescription(`Annual motorcycle event with live music.
+
+Type: event
+Category: Motorcycle Event
+Organizer: River Riders M/C
+Cost/tickets: Event entry fee: $35
+
+Reviewed ambiguity notes:
+The exact end time was not stated.
+
+---
+coverage_status: planned`)
+
+    expect(parsed.publicDescription).toBe('Annual motorcycle event with live music.')
+    expect(parsed.fields.type).toBe('event')
+    expect(parsed.fields.category).toBe('Motorcycle Event')
+    expect(parsed.fields.organizer).toBe('River Riders M/C')
+    expect(parsed.fields.price_text).toBe('Event entry fee: $35')
+    expect(parsed.fields.coverage_status).toBe('planned')
+    expect(parsed.publicDescription).not.toContain('Reviewed ambiguity notes')
+  })
+
   it('only accepts https urls', () => {
     expect(safeHttpsUrl('https://example.com/path')).toBe('https://example.com/path')
     expect(safeHttpsUrl('www.example.com/path')).toBe('https://www.example.com/path')

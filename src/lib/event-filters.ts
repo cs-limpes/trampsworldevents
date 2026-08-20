@@ -147,9 +147,12 @@ export function getFilteredAgendaSections(
 }
 
 export function buildFilterOptions(events: PublicEvent[]): FilterOptions {
+  const availableStates = new Set(events.map((event) => event.venue?.state))
+  const availableVerticals = new Set(events.map((event) => event.taxonomy.vertical))
+
   return {
-    states: TRAMPSWORLD_STATES,
-    verticals: TRAMPSWORLD_VERTICALS,
+    states: TRAMPSWORLD_STATES.filter((state) => availableStates.has(state)),
+    verticals: TRAMPSWORLD_VERTICALS.filter((vertical) => availableVerticals.has(vertical)),
     categories: sortByLabel(unique(events.map((event) => event.taxonomy.primaryCategory))),
     cities: sortText(unique(events.map((event) => event.venue?.city))),
     neighborhoods: sortText(unique(events.map((event) => event.venue?.neighborhood))),

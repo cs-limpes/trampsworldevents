@@ -58,11 +58,13 @@ export function parseEventDescription(description?: string): ParsedMetadata {
   const normalized = description.replace(/\r\n/g, '\n')
   const lines = normalized.split('\n')
   const delimiterIndex = lines.findIndex((line) => line.trim() === '---')
-  const legacyMetadata = delimiterIndex === -1 ? splitLegacyMetadata(lines) : undefined
-  const publicLines =
-    delimiterIndex === -1 ? (legacyMetadata?.publicLines ?? lines) : lines.slice(0, delimiterIndex)
-  const metadataLines =
-    delimiterIndex === -1 ? (legacyMetadata?.metadataLines ?? []) : lines.slice(delimiterIndex + 1)
+  const preDelimiterLines = delimiterIndex === -1 ? lines : lines.slice(0, delimiterIndex)
+  const legacyMetadata = splitLegacyMetadata(preDelimiterLines)
+  const publicLines = legacyMetadata?.publicLines ?? preDelimiterLines
+  const metadataLines = [
+    ...(legacyMetadata?.metadataLines ?? []),
+    ...(delimiterIndex === -1 ? [] : lines.slice(delimiterIndex + 1)),
+  ]
   const warnings: string[] = []
   const fields: Record<string, string> = {}
 

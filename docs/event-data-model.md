@@ -130,7 +130,7 @@ Accepted values:
 - `dirttramp`
 - `unclassified`
 
-Vertical assignment should come from explicit metadata or a documented conservative classification rule. Ambiguous events remain `unclassified`.
+Vertical assignment should come from explicit metadata or a documented conservative classification rule. When vertical metadata is absent, unmistakable car-show, motorcycle, boat/water, and off-road categories map to their corresponding vertical; an explicit `cruise-in` category maps to HotRodTramp. Ambiguous races, rallies, festivals, and generic events remain `unclassified`.
 
 ## Categories
 
@@ -184,6 +184,7 @@ coverage_status: planned
 ```
 
 Existing delimiter-free Flyer2Calendar metadata may continue to be parsed when recognized. Migration should not break currently working feeds.
+Descriptions that temporarily combine recognized legacy metadata before `---` with newer metadata after it are also parsed during migration; the preferred format remains one delimiter followed by all metadata.
 
 ## Allowed metadata keys
 

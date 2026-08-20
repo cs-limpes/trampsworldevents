@@ -66,8 +66,8 @@ export function normalizeGoogleEvent(source: GoogleCalendarEvent): PublicEvent |
   const status = normalizeStatus(source.status)
   const timezone = getGoogleEventTimezone(source)
   const state = normalizeState(metadata.fields.state, source.location)
-  const vertical = normalizeVertical(metadata.fields.vertical)
   const category = normalizeCategory(metadata.fields.category)
+  const vertical = normalizeVertical(metadata.fields.vertical, category, metadata.fields.category)
 
   return {
     id: buildPublicEventId(eventId, source),
@@ -209,7 +209,13 @@ function normalizeState(value?: string, location?: string): TrampsWorldState {
 }
 
 function normalizeStateValue(value?: string): TrampsWorldState {
-  const normalized = value?.trim().toLowerCase().replace(/\./g, '').replace(/[_-]+/g, ' ').replace(/\s+/g, ' ')
+  const normalized = value
+    ?.trim()
+    .toLowerCase()
+    .replace(/\./g, '')
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+\d{5}(?:\s*\d{4})?$/, '')
+    .replace(/\s+/g, ' ')
 
   if (!normalized) {
     return 'unknown'
@@ -231,11 +237,15 @@ function normalizeStateValue(value?: string): TrampsWorldState {
   return STATE_VALUES.has(state) ? state : 'unknown'
 }
 
-function normalizeVertical(value?: string): TrampsWorldVertical {
+function normalizeVertical(
+  value?: string,
+  category?: EventCategory,
+  sourceCategory?: string,
+): TrampsWorldVertical {
   const normalized = value?.trim().toLowerCase().replace(/[^a-z0-9]+/g, '')
 
   if (!normalized) {
-    return 'unclassified'
+    return inferVerticalFromCategory(category, sourceCategory)
   }
 
   const aliases: Record<string, TrampsWorldVertical> = {
@@ -258,6 +268,19 @@ function normalizeVertical(value?: string): TrampsWorldVertical {
 
   const vertical = aliases[normalized] ?? 'unclassified'
   return VERTICAL_VALUES.has(vertical) ? vertical : 'unclassified'
+}
+
+function inferVerticalFromCategory(category?: EventCategory, sourceCategory?: string): TrampsWorldVertical {
+  if (category === 'car-show') return 'hotrodtramp'
+  if (category === 'motorcycle-event') return 'cycletramp'
+  if (category === 'boat-water-event') return 'rivertramp'
+  if (category === 'off-road-event') return 'dirttramp'
+
+  if (category === 'meet-cruise' && /\bcruise[-\s]?in\b/i.test(sourceCategory ?? '')) {
+    return 'hotrodtramp'
+  }
+
+  return 'unclassified'
 }
 
 function normalizeAudience(value?: string, description?: string, category?: string): EventAudience[] {

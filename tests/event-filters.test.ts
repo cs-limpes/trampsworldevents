@@ -177,8 +177,8 @@ describe('event filters', () => {
     ])
 
     expect(options).toMatchObject({
-      states: ['AZ', 'CA', 'NV', 'NM', 'unknown'],
-      verticals: ['hotrodtramp', 'cycletramp', 'rivertramp', 'dirttramp', 'unclassified'],
+      states: ['AZ'],
+      verticals: ['hotrodtramp'],
       categories: ['car-show'],
       cities: ['Tucson'],
       neighborhoods: ['Fairgrounds'],
