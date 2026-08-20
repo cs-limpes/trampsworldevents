@@ -25,3 +25,15 @@ Useful commands:
 - `npm run typecheck`
 - `npm run build`
 - `npm run dev`
+
+## Planned TrampsWorld attendance
+
+Google Calendar remains the editorial source of truth. To mark an event that TrampsWorld plans to attend or cover, add this line to the metadata portion of its Google Calendar description:
+
+```text
+coverage_status: planned
+```
+
+For the preferred metadata format, place it after the `---` delimiter. If the description already contains a metadata section, add the line alongside the existing fields rather than adding another delimiter.
+
+Only events marked `planned` appear in the “Where We're Headed Next” schedule and receive the Scamp attendance badge. Use `none` when attendance is not planned and `published` only after TrampsWorld coverage has been published. See `docs/event-data-model.md` for the complete metadata convention.

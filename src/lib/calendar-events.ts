@@ -38,6 +38,7 @@ export function toFullCalendarEvents(
       `calendar-category-${event.taxonomy.primaryCategory}`,
       event.multiDay ? 'calendar-event-multi-day' : '',
       event.status === 'cancelled' ? 'calendar-event-cancelled' : '',
+      event.editorial.coverageStatus === 'planned' ? 'calendar-event-planned' : '',
     ].filter(Boolean),
     extendedProps: {
       publicEvent: event,

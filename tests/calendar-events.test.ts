@@ -47,6 +47,23 @@ describe('calendar events', () => {
     expect(calendarEvents[0].end).toBe('2026-12-13T01:00:00')
   })
 
+  it('preserves planned coverage data and adds a calendar attendance class', () => {
+    const planned = event({
+      id: 'planned-stop',
+      editorial: {
+        featured: false,
+        promoted: false,
+        sponsored: false,
+        coverageStatus: 'planned',
+      },
+    })
+
+    const [calendarEvent] = toFullCalendarEvents([planned])
+
+    expect(calendarEvent.extendedProps.publicEvent.editorial.coverageStatus).toBe('planned')
+    expect(calendarEvent.classNames).toContain('calendar-event-planned')
+  })
+
 
   it('deduplicates repeated section events by public event id', () => {
     const duplicate = event({ id: 'duplicate' })
