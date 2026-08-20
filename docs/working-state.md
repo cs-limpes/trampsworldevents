@@ -1,6 +1,6 @@
 # Current Working State
 
-Last updated: 2026-07-13
+Last updated: 2026-08-20
 
 ## Repository origin
 
@@ -52,6 +52,10 @@ Completed changes include:
 - timed events preserve source IANA timezone or fixed offset for event-local display where available
 - all-day events remain date-only
 - provisional TrampsWorld orange and black design tokens and vertical visual treatments are applied
+- the header uses the local Scamp mascot asset instead of the former externally hosted WordPress logo
+- the browse page includes a compact "On the Road with TrampsWorld" schedule for upcoming events marked as planned coverage
+- Agenda and FullCalendar presentations show a Scamp attendance indicator only for planned-coverage events
+- planned attendance is maintained in Google Calendar description metadata with `coverage_status: planned`; current-month appearances are spotlighted automatically and later appearances are collapsed by default
 
 ## Current architecture
 
@@ -88,7 +92,7 @@ Known public Fresno production identity has been removed from application code, 
 
 ## Current task
 
-Phase B: TrampsWorld conversion is complete in the repository.
+Phase B: TrampsWorld conversion is complete in the repository. The authorized Phase D planned-coverage slice is implemented locally for review.
 
 Do not deploy or begin Phase C unless explicitly authorized.
 

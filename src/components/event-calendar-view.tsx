@@ -7,6 +7,7 @@ import { AGENDA_TIMEZONE } from '../lib/agenda-sections'
 import { toFullCalendarEvents } from '../lib/calendar-events'
 import { getEventDetailPath } from '../lib/event-detail'
 import type { PublicEvent } from '../types/events'
+import { PlannedCoverageBadge } from './planned-coverage-badge'
 
 export function EventCalendarView({ events, currentSearch }: { events: PublicEvent[]; currentSearch: string }) {
   const [calendarView, setCalendarView] = useState(getPreferredCalendarView)
@@ -87,6 +88,7 @@ function CalendarEventContent({ arg }: { arg: EventContentArg }) {
   return (
     <span className="calendar-event-content">
       <span className="calendar-event-title">{event.title}</span>
+      {event.editorial.coverageStatus === 'planned' && <PlannedCoverageBadge compact />}
     </span>
   )
 }

@@ -180,6 +180,7 @@ sponsored: false
 source: https://example.com/event
 video: https://youtube.com/example
 gallery: https://example.com/gallery
+coverage_status: planned
 ```
 
 Existing delimiter-free Flyer2Calendar metadata may continue to be parsed when recognized. Migration should not break currently working feeds.
@@ -218,6 +219,8 @@ Initial keys include:
 - `video`
 - `gallery`
 - `coverage_status`
+
+Set `coverage_status: planned` in the metadata portion of a Google Calendar event description when TrampsWorld has confirmed plans to attend or cover the event. Use `none` for no planned coverage and `published` only after coverage has been published. Only `planned` receives the public attendance indicator and appears in the road schedule.
 
 Unknown keys should be ignored and optionally logged in development.
 

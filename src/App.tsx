@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { EventCalendarView } from './components/event-calendar-view'
+import { PlannedCoverageBadge } from './components/planned-coverage-badge'
 import type { AgendaSection } from './lib/agenda-sections'
 import { uniqueEventsById } from './lib/calendar-events'
 import { formatKnownState, formatStateLabel, formatVerticalLabel } from './lib/event-taxonomy'
@@ -31,6 +32,7 @@ import {
   type FilterState,
 } from './lib/event-filters'
 import { fetchEvents } from './lib/events-api'
+import { getPlannedCoverageSchedule, getVisiblePlannedCoverageEvents } from './lib/planned-coverage'
 import type { ContactDraftRequest, ContactDraftResponse, ContactErrorResponse, ContactIntent } from './types/contact'
 import type { EventsResponse, PublicEvent } from './types/events'
 import './styles.css'
@@ -97,8 +99,8 @@ export function App() {
       <header className="site-header">
         <div className="masthead">
           <a className="wordmark" href="/">
-            <img src="https://i0.wp.com/trampsworld.com/wp-content/uploads/2026/05/cropped-TheTrampsWorld-on-Clear.png" alt="TrampsWorld" />
-            <span>Events</span>
+            <img src="/img/scampworldsmall.png" alt="Scamp, the TrampsWorld mascot" />
+            <span className="wordmark-text">TrampsWorld <strong>Events</strong></span>
           </a>
           <p className="eyebrow">Today, This Weekend, and Upcoming</p>
         </div>
@@ -127,7 +129,10 @@ export function App() {
             (route.kind === 'event-detail' ? (
               <EventDetailPage data={state.data} pathname={route.pathname} />
             ) : (
-              <AgendaSections data={state.data} />
+              <>
+                <PlannedCoverageSection events={state.data.events} />
+                <AgendaSections data={state.data} />
+              </>
             ))}
         </>
       )}
@@ -236,6 +241,7 @@ function EventDetail({ event }: { event: PublicEvent }) {
             {event.allDay && <span>All day</span>}
             {event.multiDay && <span>Multi-day</span>}
           </div>
+          {event.editorial.coverageStatus === 'planned' && <PlannedCoverageBadge />}
           <h2 id="event-detail-heading">{event.title}</h2>
           <p className="event-time">{formatEventDateTime(event)}</p>
           {location && <p className="event-location">{location}</p>}
@@ -634,6 +640,59 @@ function AgendaSections({ data }: { data: EventsResponse }) {
   )
 }
 
+function PlannedCoverageSection({ events }: { events: PublicEvent[] }) {
+  const [expanded, setExpanded] = useState(false)
+  const schedule = useMemo(() => getPlannedCoverageSchedule(events), [events])
+  const visibleEvents = getVisiblePlannedCoverageEvents(schedule, expanded)
+
+  return (
+    <section className="planned-coverage" aria-labelledby="planned-coverage-heading">
+      <div className="planned-coverage-intro">
+        <img src="/img/scampworldsmall.png" alt="Scamp, the TrampsWorld mascot" />
+        <div>
+          <p className="eyebrow">On the road with TrampsWorld</p>
+          <h2 id="planned-coverage-heading">Where We&apos;re Headed Next</h2>
+          <p>These are the stops TrampsWorld plans to attend and cover—not just events on the regional calendar.</p>
+        </div>
+      </div>
+
+      {visibleEvents.length > 0 ? (
+        <ul className="planned-coverage-list">
+          {visibleEvents.map((event) => {
+            const location = formatEventLocation(event)
+
+            return (
+              <li key={event.id}>
+                <div>
+                  <p className="planned-coverage-date">{formatEventDateTime(event)}</p>
+                  <h3>
+                    <a href={getEventDetailPath(event)}>{event.title}</a>
+                  </h3>
+                  {location && <p className="planned-coverage-location">{location}</p>}
+                </div>
+                <PlannedCoverageBadge compact />
+              </li>
+            )
+          })}
+        </ul>
+      ) : (
+        <p className="planned-coverage-empty">No upcoming TrampsWorld appearances are confirmed yet.</p>
+      )}
+
+      {schedule.remaining.length > 0 && (
+        <button
+          className="planned-coverage-toggle"
+          type="button"
+          aria-expanded={expanded}
+          onClick={() => setExpanded((current) => !current)}
+        >
+          {expanded ? 'Show Only Our Next Stops' : 'See Our Full Schedule'}
+        </button>
+      )}
+    </section>
+  )
+}
+
 function DisplayModeToggle({
   display,
   onChange,
@@ -920,6 +979,7 @@ function EventListItem({ event }: { event: PublicEvent }) {
               {event.allDay && <span>All day</span>}
               {event.multiDay && <span>Multi-day</span>}
             </div>
+            {event.editorial.coverageStatus === 'planned' && <PlannedCoverageBadge />}
             <h4>
               <a className="event-title-link" href={detailPath}>
                 {event.title}
