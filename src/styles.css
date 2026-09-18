@@ -578,6 +578,7 @@ h1 {
   color: inherit;
   background: transparent;
   border: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .calendar-surface .fc .calendar-event-clickable {
