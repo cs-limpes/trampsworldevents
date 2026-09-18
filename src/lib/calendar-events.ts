@@ -39,6 +39,7 @@ export function toFullCalendarEvents(
       event.multiDay ? 'calendar-event-multi-day' : '',
       event.status === 'cancelled' ? 'calendar-event-cancelled' : '',
       event.editorial.coverageStatus === 'planned' ? 'calendar-event-planned' : '',
+      event.source.recurringEventId ? 'calendar-event-recurring' : '',
     ].filter(Boolean),
     extendedProps: {
       publicEvent: event,

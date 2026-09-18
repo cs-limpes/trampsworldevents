@@ -623,6 +623,20 @@ h1 {
   font-weight: 800;
 }
 
+.calendar-surface .fc .calendar-event-recurring .calendar-event-content {
+  padding-block: 0.15rem;
+  color: var(--color-text-muted);
+  background: #f4f4f1;
+  border-left-width: 2px;
+  opacity: 0.86;
+}
+
+.calendar-surface .fc .calendar-event-recurring:hover .calendar-event-content {
+  color: var(--color-text);
+  background: #fff2dc;
+  opacity: 1;
+}
+
 .planned-coverage-badge {
   display: inline-flex;
   width: fit-content;
@@ -745,6 +759,61 @@ h1 {
   border: 1px solid var(--color-border);
   border-radius: 0.5rem;
   box-shadow: 0 0.65rem 1.6rem rgba(14, 61, 66, 0.08);
+}
+
+.event-item-recurring {
+  box-shadow: none;
+}
+
+.recurring-event-card {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-left: 3px solid var(--color-border);
+}
+
+.recurring-event-summary {
+  min-width: 0;
+}
+
+.recurring-event-label {
+  display: inline-block;
+  padding: 0.12rem 0.4rem;
+  margin-bottom: var(--space-1);
+  color: var(--color-text-muted);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.event-item-recurring h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.event-item-recurring .event-time,
+.event-item-recurring .event-location {
+  display: inline;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.event-item-recurring .event-location::before {
+  content: " \00b7 ";
+}
+
+.recurring-event-details {
+  flex: 0 0 auto;
+  min-height: 2.75rem;
+  align-items: center;
 }
 
 .event-card-layout {
@@ -1282,6 +1351,7 @@ h1 {
     padding: var(--space-2) var(--space-3);
     border: 1px solid var(--color-border);
     border-radius: 0.45rem;
+    cursor: pointer;
   }
 
   .calendar-surface .fc .fc-list-event {
@@ -1335,6 +1405,20 @@ h1 {
 
   .event-card-layout {
     grid-template-columns: 1fr;
+  }
+
+  .recurring-event-card {
+    align-items: flex-start;
+    padding: var(--space-3);
+  }
+
+  .event-item-recurring .event-time,
+  .event-item-recurring .event-location {
+    display: block;
+  }
+
+  .event-item-recurring .event-location::before {
+    content: none;
   }
 
   .event-visual {

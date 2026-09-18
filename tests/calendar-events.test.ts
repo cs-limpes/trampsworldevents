@@ -64,6 +64,22 @@ describe('calendar events', () => {
     expect(calendarEvent.classNames).toContain('calendar-event-planned')
   })
 
+  it('marks recurring occurrences for quieter calendar presentation', () => {
+    const recurring = event({
+      id: 'weekly-bike-night-20260708',
+      source: {
+        provider: 'google-calendar',
+        eventId: 'weekly-bike-night-20260708',
+        recurringEventId: 'weekly-bike-night',
+        originalStartTime: '2026-07-08T18:00:00-07:00',
+      },
+    })
+
+    const [calendarEvent] = toFullCalendarEvents([recurring])
+
+    expect(calendarEvent.classNames).toContain('calendar-event-recurring')
+  })
+
 
   it('deduplicates repeated section events by public event id', () => {
     const duplicate = event({ id: 'duplicate' })

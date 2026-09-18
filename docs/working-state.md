@@ -1,6 +1,6 @@
 # Current Working State
 
-Last updated: 2026-08-20
+Last updated: 2026-09-18
 
 ## Repository origin
 
@@ -34,6 +34,8 @@ The application already includes:
 - structured event data and Open Graph support
 - corrections and event-lead contact handoff
 - automated tests covering normalization, metadata, date ranges, filters, calendar mapping, details, recurrence, and contact behavior
+- compact agenda rows and quieter calendar styling for recurring occurrences
+- direct mouse, keyboard, and touch navigation from FullCalendar event elements, including mobile list view
 
 ## Phase B conversion completed
 
