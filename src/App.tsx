@@ -962,6 +962,28 @@ function EventListItem({ event }: { event: PublicEvent }) {
   const dateBadge = getDateBadge(event)
   const detailPath = `${getEventDetailPath(event)}${window.location.search}`
 
+  if (event.source.recurringEventId) {
+    return (
+      <li className="event-item event-item-recurring">
+        <article className="recurring-event-card">
+          <div className="recurring-event-summary">
+            <span className="recurring-event-label">Recurring</span>
+            <h4>
+              <a className="event-title-link" href={detailPath}>
+                {event.title}
+              </a>
+            </h4>
+            <p className="event-time">{dateTime}</p>
+            {location && <p className="event-location">{location}</p>}
+          </div>
+          <a className="event-link recurring-event-details" href={detailPath} aria-label={`Details for ${event.title}`}>
+            Details
+          </a>
+        </article>
+      </li>
+    )
+  }
+
   return (
     <li className="event-item">
       <article>

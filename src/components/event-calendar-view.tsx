@@ -110,16 +110,21 @@ function prepareCalendarEvent({ event, el }: EventMountArg): void {
   }
 
   if (event.url && !(el instanceof HTMLAnchorElement)) {
+    const navigateToEvent = () => {
+      window.location.href = event.url
+    }
+
     el.setAttribute('role', 'link')
     el.setAttribute('tabindex', '0')
     el.classList.add('calendar-event-clickable')
+    el.addEventListener('click', navigateToEvent)
     el.addEventListener('keydown', (keyboardEvent) => {
       if (keyboardEvent.key !== 'Enter' && keyboardEvent.key !== ' ') {
         return
       }
 
       keyboardEvent.preventDefault()
-      window.location.href = event.url
+      navigateToEvent()
     })
   }
 }
