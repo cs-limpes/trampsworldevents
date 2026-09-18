@@ -36,6 +36,7 @@ The application already includes:
 - automated tests covering normalization, metadata, date ranges, filters, calendar mapping, details, recurrence, and contact behavior
 - compact agenda rows and quieter calendar styling for recurring occurrences
 - direct mouse, keyboard, and touch navigation from FullCalendar event elements, including mobile list view
+- native mobile tap highlighting is suppressed on calendar events so it cannot persist across back navigation; explicit keyboard focus styling remains intact
 
 ## Phase B conversion completed
 
